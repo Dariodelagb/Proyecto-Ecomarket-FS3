@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Gestión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .nav-buttons { margin-bottom: 30px; }
+        .table-container { background: #f8f9fa; padding: 20px; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1>Panel de Administración</h1>
+    </div>
+
+    <div class="d-flex justify-content-center nav-buttons gap-3 flex-wrap">
+        <a href="/productos" th:classappend="${view == 'productos' ? 'btn-primary' : 'btn-outline-primary'}" class="btn shadow-sm">Productos</a>
+        <a href="/ventas-completas" th:classappend="${view == 'ventas' ? 'btn-success' : 'btn-outline-success'}" class="btn shadow-sm">Ventas</a>
+        <a href="/clientes" th:classappend="${view == 'clientes' ? 'btn-info' : 'btn-outline-info'}" class="btn shadow-sm">Clientes</a>
+        <a href="/bodega" th:classappend="${view == 'bodega' ? 'btn-warning' : 'btn-outline-warning'}" class="btn shadow-sm">Bodega</a>
+        <a href="/categorias" th:classappend="${view == 'categorias' ? 'btn-danger' : 'btn-outline-danger'}" class="btn shadow-sm">Categorías</a>
+    </div>
+
+    <div class="table-container shadow-sm">
+        
+        <div th:if="${view == 'productos'}">
+            <h3 class="mb-3">Inventario de Productos</h3>
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Categoría</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p : ${lista}">
+                        <td th:text="${p.id}"></td>
+                        <td class="fw-bold" th:text="${p.nombre}"></td>
+                        <td th:text="'$' + ${p.precio}"></td>
+                        <td>
+                            <span class="badge bg-info text-dark" 
+                                  th:text="${p.categoria != null ? p.categoria.categoria : 'Sin categoría'}">
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${view == 'ventas'}">
+            <h3 class="mb-3">Registro de Ventas</h3>
+            <table class="table table-hover align-middle">
+                <thead class="table-success">
+                    <tr>
+                        <th>ID Venta</th>
+                        <th>Cliente</th>
+                        <th>Monto total</th>
+                        <th>Productos</th>
+                        <th>Envío</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="v : ${lista}">
+                        <td th:text="${v.id}"></td>
+                        <td th:text="${v.cliente.nombres + ' ' + v.cliente.apellidos}"></td>
+                        <td th:text="'$' + ${v.monto}"></td>
+                        <td>
+                            <ul class="list-unstyled mb-0">
+                                <li th:each="detalle : ${v.detalles}" th:text="${detalle.cantidad + ' x ' + detalle.producto.nombre}"></li>
+                            </ul>
+                        </td>
+                        <td>
+                            <span class="badge" 
+                                  th:classappend="${v.tipoEnvio == 'Domicilio' ? 'bg-warning' : 'bg-secondary'}"
+                                  th:text="${v.tipoEnvio}">
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${view == 'categorias'}">
+            <h3 class="mb-3">Categorías de Productos</h3>
+            <table class="table table-hover align-middle">
+                <thead class="table-danger">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="c : ${lista}">
+                        <td th:text="${c.id}"></td>
+                        <td class="fw-bold" th:text="${c.categoria}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${view == 'clientes'}">
+            <h3>Directorio de Clientes</h3>
+            <table class="table table-hover">
+                <thead class="table-info">
+                    <tr><th>ID</th><th>Nombre</th><th>RUT</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="c : ${lista}">
+                        <td th:text="${c.id}"></td>
+                        <td th:text="${c.nombres + ' ' + c.apellidos}"></td>
+                        <td th:text="${c.rut + '-' + c.dvrut}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${view == 'bodega'}">
+            <h3>Control de Bodega</h3>
+            <table class="table table-hover">
+                <thead class="table-warning">
+                    <tr><th>Producto</th><th>Stock Actual</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="b : ${lista}">
+                        <td th:text="${b.producto.nombre}"></td>
+                        <td th:text="${b.stock}" class="fw-bold"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
