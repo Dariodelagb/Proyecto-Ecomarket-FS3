@@ -1,5 +1,5 @@
-# Dockerfile for db microservice
-FROM openjdk:17-jdk-slim
+# Dockerfile for frontend microservice
+FROM eclipse-temurin:17
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
-# Download dependencies (this layer will be cached if pom.xml doesn't change)
+# Download dependencies
 RUN ./mvnw dependency:go-offline -B
 
 # Copy source code
@@ -18,7 +18,7 @@ COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
 # Expose port
-EXPOSE 8080
+EXPOSE 8081
 
 # Run the application
-CMD ["java", "-jar", "target/db-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "target/frontend-0.0.1-SNAPSHOT.jar"]

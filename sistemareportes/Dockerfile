@@ -1,5 +1,5 @@
 # Dockerfile for sistemareportes microservice
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17
 
 WORKDIR /app
 
