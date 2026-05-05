@@ -12,7 +12,7 @@ import java.util.List;
 public class ProductoService {
     
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String API_URL = "http://localhost:8080/api/productos";
+    private final String API_URL = "http://db:8080/api/productos";
 
     public List<ProductoDTO> obtenerProductos() {
         // Llama al backend y trae la lista
