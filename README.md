@@ -17,12 +17,14 @@ Para clonar y levantar el sistema:
 Abre la terminal y ejecuta:
 
 git clone https://github.com/Dariodelagb/Proyecto-Ecomarket-FS3.git
+
 cd Proyecto-Ecomarket-FS3
 
 ### 2. Levantar los contenedores
 Para iniciar el proyecto, ejecuta el siguiente comando:
 
 docker-compose up --build
+
 Nota: Esto tarda bastante.
 
 ### 3. Acceso al sistema
