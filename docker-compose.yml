@@ -14,6 +14,13 @@ services:
       - ./db/db/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     networks:
       - ecomarket_network
+    healthcheck:
+      # Este comando intenta hacer un SELECT real a la tabla del sistema
+      test: ["CMD-SHELL", "mysql -u root -proot -e 'SELECT 1;'"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   db:
     build: ./db/db
@@ -21,7 +28,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/sistema_ventas?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root

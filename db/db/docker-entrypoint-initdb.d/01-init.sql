@@ -81,10 +81,10 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ============================================================
 
 INSERT INTO CategoriaProducto (id, categoria) VALUES
-(1, 'Perfumes'),
-(2, 'Maquillaje'),
-(3, 'Jabones'),
-(4, 'Botellas')
+('Perfumes'),
+('Maquillaje'),
+('Jabones'),
+('Botellas')
 ON DUPLICATE KEY UPDATE categoria = VALUES(categoria);
 
 -- ============================================================
