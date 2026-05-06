@@ -15,7 +15,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- 1. Tabla de Categorías
 CREATE TABLE IF NOT EXISTS CategoriaProducto (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    categoria VARCHAR(100) NOT NULL
+    categoria VARCHAR(100) NOT NULL UNIQUE
 );
 
 -- 2. Tabla de Clientes
@@ -80,7 +80,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- INSERTAR CATEGORÍAS DE PRODUCTOS
 -- ============================================================
 
-INSERT INTO CategoriaProducto (id, categoria) VALUES
+INSERT INTO CategoriaProducto (categoria) VALUES
 ('Perfumes'),
 ('Maquillaje'),
 ('Jabones'),
