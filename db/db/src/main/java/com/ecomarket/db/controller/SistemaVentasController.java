@@ -43,6 +43,11 @@ public class SistemaVentasController {
     @GetMapping("/clientes")
     public List<Cliente> listarClientes() { return clienteRepo.findAll(); }
 
+    @GetMapping("/clientes/count")
+    public Map<String, Long> contarClientes() {
+        return Map.of("total", clienteRepo.count());
+    }
+
     @PostMapping("/clientes")
     public Cliente crearCliente(@RequestBody Cliente cliente) { return clienteRepo.save(cliente); }
 
@@ -104,6 +109,11 @@ public class SistemaVentasController {
     @GetMapping("/ventas-completas")
     public List<Venta> listarVentasCompletas() {
         return ventaRepo.findAll();
+    }
+
+    @GetMapping("/ventas/count")
+    public Map<String, Long> contarVentas() {
+        return Map.of("total", ventaRepo.count());
     }
 
     // --- BOLETAS ---
