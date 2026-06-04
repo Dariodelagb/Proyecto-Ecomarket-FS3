@@ -57,6 +57,14 @@ services:
     networks:
       - ecomarket_network
 
+  frontend_node:
+    build: ./frontend_node
+    container_name: ecomarket_frontend_node
+    ports:
+      - "8083:80"
+    networks:
+      - ecomarket_network
+
 volumes:
   mysql_data:
 
