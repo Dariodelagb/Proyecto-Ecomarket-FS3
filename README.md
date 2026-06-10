@@ -3,9 +3,10 @@
 Proyecto desarrollado para la gestión de productos, inventarios y ventas, containerizado con **Docker** para garantizar consistencia entre entornos.
 
 ## Requisitos
-
+Instalar:
 - [Docker](https://www.docker.com/products/docker-desktop/).
 - [Git](https://git-scm.com/).
+- [NodeJS](https://nodejs.org/en/download).
 
 ---
 
@@ -21,6 +22,10 @@ git clone https://github.com/Dariodelagb/Proyecto-Ecomarket-FS3.git
 cd Proyecto-Ecomarket-FS3
 
 ### 2. Levantar los contenedores
+Antes de levantar los contenedores, ejecuta **npm install** en la raiz del frontend_node
+
+Abre Docker Desktop
+
 Para iniciar el proyecto, ejecuta el siguiente comando:
 
 docker-compose up --build
