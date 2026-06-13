@@ -15,16 +15,16 @@ services:
     networks:
       - ecomarket_network
     healthcheck:
-      # Este comando intenta hacer un SELECT real a la tabla del sistema
-      test: ["CMD-SHELL", "mysql -u root -proot -e 'SELECT 1;'"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
       interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
+      timeout: 10s
+      retries: 30
+      start_period: 90s
 
   db:
     build: ./db/db
     container_name: ecomarket_db
+    restart: on-failure
     ports:
       - "8080:8080"
     depends_on:
@@ -38,6 +38,8 @@ services:
       - ecomarket_network
 
   frontend:
+    profiles:
+      - old-frontend
     build: ./frontend/frontend
     container_name: ecomarket_frontend
     ports:
@@ -60,8 +62,12 @@ services:
   frontend_node:
     build: ./frontend_node
     container_name: ecomarket_frontend_node
+    restart: on-failure
     ports:
       - "8083:80"
+    depends_on:
+      db:
+        condition: service_started
     networks:
       - ecomarket_network
 
