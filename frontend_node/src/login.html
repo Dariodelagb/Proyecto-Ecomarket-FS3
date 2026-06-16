@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Iniciar sesion | EcoMarket</title>
+  </head>
+  <body class="home-page auth-page">
+    <header class="home-nav">
+      <a href="index.html#home" class="home-brand">EcoMarket</a>
+      <nav class="home-menu" aria-label="Navegacion principal">
+        <a href="index.html#home">Home</a>
+        <a href="productos.html">Productos</a>
+      </nav>
+      <div class="home-auth-actions">
+        <a class="home-auth-link auth-guest-only" href="registro.html">Registrarse</a>
+        <a class="home-auth-link auth-guest-only" href="login.html">Iniciar sesion</a>
+        <button class="home-auth-link auth-session-only" type="button" data-logout>Cerrar sesion</button>
+      </div>
+      <a class="home-cart-link" href="carrito.html" aria-label="Ver carrito">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm10 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3ZM4.8 5l.5 2h14.4l-1.9 7.2H7.1L4.9 3.8H2.5V2h3.8l.7 3Z" />
+        </svg>
+        <span id="cart-count">0</span>
+      </a>
+    </header>
+
+    <main>
+      <section class="auth-layout">
+        <div class="auth-copy">
+          <p class="home-kicker">Sesion</p>
+          <h1>Inicia sesion</h1>
+          <p>Ingresa con correo, RUT, digito verificador y contrasena.</p>
+        </div>
+
+        <form class="auth-form" id="login-form">
+          <label>Correo<input name="email" type="email" required /></label>
+          <div class="auth-grid">
+            <label>RUT<input name="rut" type="number" required /></label>
+            <label>DV<input name="dvrut" type="text" maxlength="1" required /></label>
+          </div>
+          <label>Contrasena<input name="contrasena" type="password" required /></label>
+          <p class="home-form__status" id="login-status" aria-live="polite"></p>
+          <button type="submit">Iniciar sesion</button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

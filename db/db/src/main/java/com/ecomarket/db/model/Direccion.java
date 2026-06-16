@@ -1,29 +1,29 @@
 package com.ecomarket.db.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.Data;
-import java.util.List;
 
 @Entity
-@Table(name = "venta")
+@Table(name = "direccion")
 @Data
-public class Venta {
+public class Direccion {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String tipoEnvio;
-    private Double monto;
+    private String calle;
+    private String numero;
+    private String comuna;
+    private String ciudad;
+    private String region;
+    private String referencia;
+    private Boolean principal;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
+    @JsonIgnore
     @lombok.ToString.Exclude
     @lombok.EqualsAndHashCode.Exclude
     private Cliente cliente;
-
-    @ManyToOne
-    @JoinColumn(name = "direccion_id")
-    private Direccion direccion;
-
-    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL)
-    private List<DetalleVenta> detalles;
 }

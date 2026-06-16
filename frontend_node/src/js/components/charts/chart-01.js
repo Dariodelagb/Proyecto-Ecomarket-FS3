@@ -1,12 +1,58 @@
 import ApexCharts from "apexcharts";
 
+const monthLabels = [
+  "Ene",
+  "Feb",
+  "Mar",
+  "Abr",
+  "May",
+  "Jun",
+  "Jul",
+  "Ago",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dic",
+];
+
+const emptyMonthlySales = () => Array.from({ length: 12 }, () => 0);
+
+const getVentaDate = (venta) => {
+  if (venta.fecha) return venta.fecha;
+
+  const detalleConFecha = venta.detalles?.find((detalle) => detalle.fecha);
+  return detalleConFecha?.fecha;
+};
+
+const loadMonthlySales = async () => {
+  const response = await fetch("/api/ventas-completas");
+  if (!response.ok) throw new Error("No se pudieron cargar las ventas");
+
+  const ventas = await response.json();
+  const monthlySales = emptyMonthlySales();
+
+  ventas.forEach((venta) => {
+    const fecha = getVentaDate(venta);
+    if (!fecha) return;
+
+    const date = new Date(`${fecha}T00:00:00`);
+    const month = date.getMonth();
+
+    if (month >= 0 && month < 12) {
+      monthlySales[month] += 1;
+    }
+  });
+
+  return monthlySales;
+};
+
 // ===== chartOne
 const chart01 = () => {
   const chartOneOptions = {
     series: [
       {
-        name: "Sales",
-        data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
+        name: "Ventas",
+        data: emptyMonthlySales(),
       },
     ],
     colors: ["#465fff"],
@@ -35,20 +81,7 @@ const chart01 = () => {
       colors: ["transparent"],
     },
     xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
+      categories: monthLabels,
       axisBorder: {
         show: false,
       },
@@ -86,7 +119,7 @@ const chart01 = () => {
       },
       y: {
         formatter: function (val) {
-          return val;
+          return `${val} ventas`;
         },
       },
     },
@@ -100,6 +133,19 @@ const chart01 = () => {
       chartOneOptions,
     );
     chartFour.render();
+
+    loadMonthlySales()
+      .then((monthlySales) => {
+        chartFour.updateSeries([
+          {
+            name: "Ventas",
+            data: monthlySales,
+          },
+        ]);
+      })
+      .catch((error) => {
+        console.error("Error cargando ventas mensuales:", error);
+      });
   }
 };
 

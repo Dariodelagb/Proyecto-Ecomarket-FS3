@@ -6,13 +6,13 @@ function formatNumber(num) {
 // Cargar productos en la tabla
 async function loadProductsTable() {
   try {
+    const tableBody = document.querySelector("table tbody");
+    if (!tableBody) return;
+
     const response = await fetch("/api/productos");
     if (!response.ok) throw new Error("Error al obtener productos");
 
     const productos = await response.json();
-    const tableBody = document.querySelector("table tbody");
-
-    if (!tableBody) return;
 
     // Limpiar filas existentes (mantener solo estructura)
     tableBody.innerHTML = "";

@@ -3,10 +3,12 @@ package com.ecomarket.db.controller;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,16 +18,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecomarket.db.model.Bodega;
 import com.ecomarket.db.model.Boleta;
+import com.ecomarket.db.model.Carrito;
 import com.ecomarket.db.model.CategoriaProducto;
 import com.ecomarket.db.model.Cliente;
+import com.ecomarket.db.model.Contacto;
 import com.ecomarket.db.model.DetalleVenta;
+import com.ecomarket.db.model.Direccion;
 import com.ecomarket.db.model.Producto;
+import com.ecomarket.db.model.SesionCliente;
 import com.ecomarket.db.model.Venta;
 import com.ecomarket.db.repository.BodegaRepository;
 import com.ecomarket.db.repository.BoletaRepository;
+import com.ecomarket.db.repository.CarritoRepository;
 import com.ecomarket.db.repository.CategoriaRepository;
 import com.ecomarket.db.repository.ClienteRepository;
+import com.ecomarket.db.repository.ContactoRepository;
+import com.ecomarket.db.repository.DireccionRepository;
 import com.ecomarket.db.repository.ProductoRepository;
+import com.ecomarket.db.repository.SesionClienteRepository;
 import com.ecomarket.db.repository.VentaRepository;
 
 @RestController
@@ -38,6 +48,10 @@ public class SistemaVentasController {
     @Autowired private VentaRepository ventaRepo;
     @Autowired private BoletaRepository boletaRepo;
     @Autowired private CategoriaRepository categoriaRepo;
+    @Autowired private DireccionRepository direccionRepo;
+    @Autowired private ContactoRepository contactoRepo;
+    @Autowired private CarritoRepository carritoRepo;
+    @Autowired private SesionClienteRepository sesionRepo;
 
     // --- CLIENTES ---
     @GetMapping("/clientes")
@@ -49,7 +63,135 @@ public class SistemaVentasController {
     }
 
     @PostMapping("/clientes")
-    public Cliente crearCliente(@RequestBody Cliente cliente) { return clienteRepo.save(cliente); }
+    public Cliente crearCliente(@RequestBody Cliente cliente) {
+        if (cliente.getDirecciones() != null) {
+            for (Direccion direccion : cliente.getDirecciones()) {
+                direccion.setCliente(cliente);
+            }
+        }
+
+        return clienteRepo.save(cliente);
+    }
+
+    // --- AUTENTICACION ---
+    @PostMapping("/auth/registro")
+    @Transactional
+    public Map<String, Object> registrarCliente(@RequestBody Cliente cliente) {
+        if (cliente.getEmail() == null || cliente.getContrasena() == null) {
+            throw new RuntimeException("Email y contrasena son obligatorios");
+        }
+
+        clienteRepo.findByEmail(cliente.getEmail()).ifPresent(existente -> {
+            throw new RuntimeException("Ya existe un cliente con ese email");
+        });
+
+        if (cliente.getDirecciones() != null) {
+            for (Direccion direccion : cliente.getDirecciones()) {
+                direccion.setCliente(cliente);
+            }
+        }
+
+        Cliente clienteGuardado = clienteRepo.save(cliente);
+        SesionCliente sesion = crearSesion(clienteGuardado);
+
+        return Map.of(
+            "token", sesion.getToken(),
+            "cliente", clienteGuardado
+        );
+    }
+
+    @PostMapping("/auth/login")
+    public Map<String, Object> iniciarSesion(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        Integer rut = Integer.valueOf(body.get("rut"));
+        String dvrut = body.get("dvrut");
+        String contrasena = body.get("contrasena");
+
+        Cliente cliente = clienteRepo
+            .findByEmailAndRutAndDvrutAndContrasena(email, rut, dvrut, contrasena)
+            .orElseThrow(() -> new RuntimeException("Credenciales invalidas"));
+
+        SesionCliente sesion = crearSesion(cliente);
+
+        return Map.of(
+            "token", sesion.getToken(),
+            "cliente", cliente
+        );
+    }
+
+    @GetMapping("/auth/sesion/{token}")
+    public Map<String, Object> verSesion(@PathVariable String token) {
+        SesionCliente sesion = sesionRepo.findByToken(token).orElseThrow();
+        return Map.of(
+            "token", sesion.getToken(),
+            "cliente", sesion.getCliente()
+        );
+    }
+
+    @DeleteMapping("/auth/sesion/{token}")
+    @Transactional
+    public Map<String, Boolean> cerrarSesion(@PathVariable String token) {
+        sesionRepo.deleteByToken(token);
+        return Map.of("ok", true);
+    }
+
+    // --- DIRECCIONES ---
+    @GetMapping("/direcciones")
+    public List<Direccion> listarDirecciones() { return direccionRepo.findAll(); }
+
+    @GetMapping("/clientes/{id}/direcciones")
+    public List<Direccion> direccionesPorCliente(@PathVariable Long id) {
+        return direccionRepo.findByClienteId(id);
+    }
+
+    @PostMapping("/clientes/{id}/direcciones")
+    public Direccion crearDireccion(@PathVariable Long id, @RequestBody Direccion direccion) {
+        Cliente cliente = clienteRepo.findById(id).orElseThrow();
+        direccion.setCliente(cliente);
+        return direccionRepo.save(direccion);
+    }
+
+    // --- CONTACTOS ---
+    @GetMapping("/contactos")
+    public List<Contacto> listarContactos() { return contactoRepo.findAll(); }
+
+    @PostMapping("/contactos")
+    public Contacto crearContacto(@RequestBody Contacto contacto) {
+        return contactoRepo.save(contacto);
+    }
+
+    // --- CARRITOS ---
+    @GetMapping("/carritos")
+    public List<Carrito> listarCarritos() { return carritoRepo.findAll(); }
+
+    @GetMapping("/carritos/cliente/{clienteId}")
+    public Carrito carritoPorCliente(@PathVariable Long clienteId) {
+        return obtenerOCrearCarrito(clienteId);
+    }
+
+    @PostMapping("/carritos/cliente/{clienteId}/productos/{productoId}")
+    @Transactional
+    public Carrito agregarProductoAlCarrito(@PathVariable Long clienteId, @PathVariable Long productoId) {
+        Carrito carrito = obtenerOCrearCarrito(clienteId);
+        Producto producto = productoRepo.findById(productoId).orElseThrow();
+
+        boolean yaExiste = carrito.getProductos().stream()
+            .anyMatch(item -> item.getId().equals(productoId));
+
+        if (!yaExiste) {
+            carrito.getProductos().add(producto);
+        }
+
+        return carritoRepo.save(carrito);
+    }
+
+    @DeleteMapping("/carritos/cliente/{clienteId}/productos/{productoId}")
+    @Transactional
+    public Carrito quitarProductoDelCarrito(@PathVariable Long clienteId, @PathVariable Long productoId) {
+        Carrito carrito = obtenerOCrearCarrito(clienteId);
+        carrito.getProductos().removeIf(producto -> producto.getId().equals(productoId));
+        return carritoRepo.save(carrito);
+    }
 
     // --- PRODUCTOS ---
     @GetMapping("/productos")
@@ -92,10 +234,20 @@ public class SistemaVentasController {
     @PostMapping("/ventas")
     @Transactional
     public Venta registrarVenta(@RequestBody Venta venta) {
+        if (venta.getDireccion() != null && venta.getDireccion().getId() != null) {
+            Direccion direccionReal = direccionRepo.findById(venta.getDireccion().getId())
+                .orElseThrow(() -> new RuntimeException("Direccion no encontrada"));
+
+            venta.setDireccion(direccionReal);
+        }
+
         // Es vital asignar la venta a cada detalle antes de guardar
         if (venta.getDetalles() != null) {
             for (DetalleVenta detalle : venta.getDetalles()) {
                 detalle.setVenta(venta);
+                if (detalle.getFecha() == null) {
+                    detalle.setFecha(LocalDate.now());
+                }
             }
         }
         return ventaRepo.save(venta);
@@ -135,5 +287,22 @@ public class SistemaVentasController {
     @PostMapping("/categorias")
     public CategoriaProducto crearCategoria(@RequestBody CategoriaProducto categoria) {
         return categoriaRepo.save(categoria);
+    }
+
+    private Carrito obtenerOCrearCarrito(Long clienteId) {
+        return carritoRepo.findByClienteId(clienteId)
+            .orElseGet(() -> {
+                Cliente cliente = clienteRepo.findById(clienteId).orElseThrow();
+                Carrito carrito = new Carrito();
+                carrito.setCliente(cliente);
+                return carritoRepo.save(carrito);
+            });
+    }
+
+    private SesionCliente crearSesion(Cliente cliente) {
+        SesionCliente sesion = new SesionCliente();
+        sesion.setCliente(cliente);
+        sesion.setToken(UUID.randomUUID().toString());
+        return sesionRepo.save(sesion);
     }
 }

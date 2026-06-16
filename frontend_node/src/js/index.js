@@ -16,6 +16,11 @@ import "./components/calendar-init.js";
 import "./components/image-resize";
 import "./components/metrics-loader";
 import "./components/products-loader";
+import "./components/home-loader";
+import "./components/auth-loader";
+import "./components/products-page-loader";
+import "./components/cart-badge-loader";
+import "./components/cart-page-loader";
 
 Alpine.plugin(persist);
 window.Alpine = Alpine;
@@ -93,6 +98,8 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", function () {
   const searchInput = document.getElementById("search-input");
   const searchButton = document.getElementById("search-button");
+
+  if (!searchInput || !searchButton) return;
 
   // Function to focus the search input
   function focusSearchInput() {

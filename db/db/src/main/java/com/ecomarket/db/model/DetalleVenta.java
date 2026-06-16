@@ -1,11 +1,14 @@
 package com.ecomarket.db.model;
 
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
+@Table(name = "detalle_venta")
 @Data
 public class DetalleVenta {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,6 +16,7 @@ public class DetalleVenta {
 
     private Integer cantidad;
     private Double precioUnitario;
+    private LocalDate fecha;
 
     @ManyToOne
     @JoinColumn(name = "producto_id")

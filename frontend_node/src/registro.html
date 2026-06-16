@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Registro | EcoMarket</title>
+  </head>
+  <body class="home-page auth-page">
+    <header class="home-nav">
+      <a href="index.html#home" class="home-brand">EcoMarket</a>
+      <nav class="home-menu" aria-label="Navegacion principal">
+        <a href="index.html#home">Home</a>
+        <a href="productos.html">Productos</a>
+      </nav>
+      <div class="home-auth-actions">
+        <a class="home-auth-link auth-guest-only" href="registro.html">Registrarse</a>
+        <a class="home-auth-link auth-guest-only" href="login.html">Iniciar sesion</a>
+        <button class="home-auth-link auth-session-only" type="button" data-logout>Cerrar sesion</button>
+      </div>
+      <a class="home-cart-link" href="carrito.html" aria-label="Ver carrito">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm10 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3ZM4.8 5l.5 2h14.4l-1.9 7.2H7.1L4.9 3.8H2.5V2h3.8l.7 3Z" />
+        </svg>
+        <span id="cart-count">0</span>
+      </a>
+    </header>
+
+    <main>
+      <section class="auth-layout">
+        <div class="auth-copy">
+          <p class="home-kicker">Registro</p>
+          <h1>Crea tu cuenta</h1>
+          <p>Registra tus datos para guardar tu sesion y usar el carrito con tu cliente.</p>
+        </div>
+
+        <form class="auth-form" id="register-form">
+          <div class="auth-grid">
+            <label>Nombre<input name="nombres" type="text" required /></label>
+            <label>Apellido<input name="apellidos" type="text" required /></label>
+            <label>RUT<input name="rut" type="number" required /></label>
+            <label>DV<input name="dvrut" type="text" maxlength="1" required /></label>
+          </div>
+          <label>Correo<input name="email" type="email" required /></label>
+          <label>Contrasena<input name="contrasena" type="password" minlength="4" required /></label>
+
+          <fieldset>
+            <legend>Direccion opcional</legend>
+            <div class="auth-grid">
+              <label>Calle<input name="calle" type="text" /></label>
+              <label>Numero<input name="numero" type="text" /></label>
+              <label>Comuna<input name="comuna" type="text" /></label>
+              <label>Ciudad<input name="ciudad" type="text" /></label>
+              <label>Region<input name="region" type="text" /></label>
+              <label>Referencia<input name="referencia" type="text" /></label>
+            </div>
+          </fieldset>
+
+          <p class="home-form__status" id="register-status" aria-live="polite"></p>
+          <button type="submit">Registrarse</button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

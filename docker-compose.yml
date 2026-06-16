@@ -34,6 +34,12 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/sistema_ventas?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec ': > /dev/tcp/127.0.0.1/8080'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
     networks:
       - ecomarket_network
 
@@ -45,17 +51,20 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - ecomarket_network
 
   sistemareportes:
     build: ./sistemareportes
     container_name: ecomarket_sistemareportes
+    restart: on-failure
     ports:
       - "8082:8082"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - ecomarket_network
 
@@ -67,7 +76,7 @@ services:
       - "8083:80"
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
     networks:
       - ecomarket_network
 

@@ -5,43 +5,35 @@ function formatNumber(num) {
 
 // Cargar conteo de usuarios (clientes)
 async function loadClientCount() {
+  const countElement = document.getElementById("count-usuarios");
+  if (!countElement) return;
+
   try {
     const response = await fetch("/api/clientes/count");
     if (!response.ok) throw new Error("Error al obtener clientes");
     
     const data = await response.json();
-    const countElement = document.getElementById("count-usuarios");
-    
-    if (countElement) {
-      countElement.textContent = formatNumber(data.total);
-    }
+    countElement.textContent = formatNumber(data.total);
   } catch (error) {
     console.error("Error cargando count de usuarios:", error);
-    const countElement = document.getElementById("count-usuarios");
-    if (countElement) {
-      countElement.textContent = "Error";
-    }
+    countElement.textContent = "Error";
   }
 }
 
 // Cargar conteo de ventas
 async function loadSalesCount() {
+  const countElement = document.getElementById("count-ventas");
+  if (!countElement) return;
+
   try {
     const response = await fetch("/api/ventas/count");
     if (!response.ok) throw new Error("Error al obtener ventas");
     
     const data = await response.json();
-    const countElement = document.getElementById("count-ventas");
-    
-    if (countElement) {
-      countElement.textContent = formatNumber(data.total);
-    }
+    countElement.textContent = formatNumber(data.total);
   } catch (error) {
     console.error("Error cargando count de ventas:", error);
-    const countElement = document.getElementById("count-ventas");
-    if (countElement) {
-      countElement.textContent = "Error";
-    }
+    countElement.textContent = "Error";
   }
 }
 

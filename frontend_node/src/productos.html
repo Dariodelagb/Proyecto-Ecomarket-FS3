@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Productos | EcoMarket</title>
+  </head>
+  <body class="home-page products-page">
+    <header class="home-nav">
+      <a href="index.html#home" class="home-brand">EcoMarket</a>
+      <nav class="home-menu" aria-label="Navegacion principal">
+        <a href="index.html#home">Home</a>
+        <a href="index.html#equipo">Equipo</a>
+        <a href="productos.html">Productos</a>
+        <a href="index.html#mapa">Mapa</a>
+        <a href="index.html#formulario">Formulario</a>
+      </nav>
+      <div class="home-auth-actions">
+        <a class="home-auth-link auth-guest-only" href="registro.html">Registrarse</a>
+        <a class="home-auth-link auth-guest-only" href="login.html">Iniciar sesion</a>
+        <button class="home-auth-link auth-session-only" type="button" data-logout>Cerrar sesion</button>
+      </div>
+      <a class="home-cart-link" href="carrito.html" aria-label="Ver carrito">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm10 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3ZM4.8 5l.5 2h14.4l-1.9 7.2H7.1L4.9 3.8H2.5V2h3.8l.7 3Z" />
+        </svg>
+        <span id="cart-count">0</span>
+      </a>
+    </header>
+
+    <main>
+      <section class="products-hero">
+        <div>
+          <p class="home-kicker">Catalogo completo</p>
+          <h1>Productos EcoMarket</h1>
+          <p>
+            Explora todos los productos cargados en la base de datos, con su
+            categoria y precio actualizado.
+          </p>
+        </div>
+        <a href="index.html#formulario" class="home-button home-button--secondary">Consultar stock</a>
+      </section>
+
+      <section class="home-section products-catalog">
+        <div class="products-toolbar">
+          <div>
+            <p>Disponibles</p>
+            <h2 id="products-page-count">Cargando productos</h2>
+          </div>
+          <a href="index.html" class="home-button home-button--catalog">Volver al inicio</a>
+        </div>
+
+        <div id="products-page-grid" class="products-page-grid">
+          <article class="home-product-card">
+            <img src="./images/product/product-01.jpg" alt="Producto EcoMarket" />
+            <div>
+              <span>Cargando</span>
+              <h3>Productos disponibles</h3>
+              <p>$0</p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="home-footer">
+      <p>EcoMarket</p>
+      <span id="year"></span>
+    </footer>
+  </body>
+</html>

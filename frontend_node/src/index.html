@@ -1,88 +1,151 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+      content="width=device-width, initial-scale=1.0"
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>
-      eCommerce Dashboard | TailAdmin - Tailwind CSS Admin Dashboard Template
-    </title>
+    <title>EcoMarket</title>
   </head>
-  <body
-    x-data="{ page: 'ecommerce', 'loaded': true, 'darkMode': false, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
-    x-init="
-         darkMode = JSON.parse(localStorage.getItem('darkMode'));
-         $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
-    :class="{'dark bg-gray-900': darkMode === true}"
-  >
-    <!-- ===== Preloader Start ===== -->
-    <include src="./partials/preloader.html"></include>
-    <!-- ===== Preloader End ===== -->
-
-    <!-- ===== Page Wrapper Start ===== -->
-    <div class="flex h-screen overflow-hidden">
-      <!-- ===== Sidebar Start ===== -->
-      <include src="./partials/sidebar.html"></include>
-      <!-- ===== Sidebar End ===== -->
-
-      <!-- ===== Content Area Start ===== -->
-      <div
-        class="relative flex flex-col flex-1 overflow-x-hidden overflow-y-auto"
-      >
-        <!-- Small Device Overlay Start -->
-        <include src="./partials/overlay.html" />
-        <!-- Small Device Overlay End -->
-
-        <!-- ===== Header Start ===== -->
-        <include src="./partials/header.html" />
-        <!-- ===== Header End ===== -->
-
-        <!-- ===== Main Content Start ===== -->
-        <main>
-          <div class="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
-            <div class="grid grid-cols-12 gap-4 md:gap-6">
-              <div class="col-span-12 space-y-6 xl:col-span-7">
-                <!-- Metric Group One -->
-                <include src="./partials/metric-group/metric-group-01.html" />
-                <!-- Metric Group One -->
-
-                <!-- ====== Chart One Start -->
-                <include src="./partials/chart/chart-01.html" />
-                <!-- ====== Chart One End -->
-              </div>
-              <div class="col-span-12 xl:col-span-5">
-                <!-- ====== Chart Two Start -->
-                <include src="./partials/chart/chart-02.html" />
-                <!-- ====== Chart Two End -->
-              </div>
-
-              <div class="col-span-12">
-                <!-- ====== Chart Three Start -->
-                <include src="./partials/chart/chart-03.html" />
-                <!-- ====== Chart Three End -->
-              </div>
-
-              <div class="col-span-12 xl:col-span-5">
-                <!-- ====== Map One Start -->
-                <include src="./partials/map-01.html" />
-                <!-- ====== Map One End -->
-              </div>
-
-              <div class="col-span-12 xl:col-span-7">
-                <!-- ====== Table One Start -->
-                <include src="./partials/table/table-01.html" />
-                <!-- ====== Table One End -->
-              </div>
-            </div>
-          </div>
-        </main>
-        <!-- ===== Main Content End ===== -->
+  <body class="home-page">
+    <header class="home-nav">
+      <a href="#home" class="home-brand">EcoMarket</a>
+      <nav class="home-menu" aria-label="Navegacion principal">
+        <a href="#home">Home</a>
+        <a href="#equipo">Equipo</a>
+        <a href="productos.html">Productos</a>
+        <a href="#mapa">Mapa</a>
+        <a href="#formulario">Formulario</a>
+      </nav>
+      <div class="home-auth-actions">
+        <a class="home-auth-link auth-guest-only" href="registro.html">Registrarse</a>
+        <a class="home-auth-link auth-guest-only" href="login.html">Iniciar sesion</a>
+        <button class="home-auth-link auth-session-only" type="button" data-logout>Cerrar sesion</button>
       </div>
-      <!-- ===== Content Area End ===== -->
-    </div>
-    <!-- ===== Page Wrapper End ===== -->
+      <a class="home-cart-link" href="carrito.html" aria-label="Ver carrito">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm10 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3ZM4.8 5l.5 2h14.4l-1.9 7.2H7.1L4.9 3.8H2.5V2h3.8l.7 3Z" />
+        </svg>
+        <span id="cart-count">0</span>
+      </a>
+    </header>
+
+    <main>
+      <section id="home" class="home-hero">
+        <div class="home-hero__media" aria-hidden="true"></div>
+        <div class="home-hero__overlay"></div>
+        <div class="home-hero__content">
+          <p class="home-kicker">Cosmetica, cuidado personal y productos reutilizables</p>
+          <h1>EcoMarket</h1>
+          <p>
+            Productos seleccionados para una rutina mas consciente, con inventario
+            actualizado y categorias claras para comprar sin vueltas.
+          </p>
+          <div class="home-actions">
+            <a href="productos.html" class="home-button home-button--primary">Ver productos</a>
+            <a href="#formulario" class="home-button home-button--secondary">Contactar</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="equipo" class="home-section home-team">
+        <div class="home-section__header">
+          <p>Equipo</p>
+          <h2>Personas detras de cada entrega</h2>
+        </div>
+        <div class="home-team__grid">
+          <article class="home-team__member">
+            <img src="./images/user/user-01.jpg" alt="Camila Torres" />
+            <div>
+              <h3>Camila Torres</h3>
+              <p>Operacion y catalogo</p>
+            </div>
+          </article>
+          <article class="home-team__member">
+            <img src="./images/user/user-02.jpg" alt="Matias Rojas" />
+            <div>
+              <h3>Matias Rojas</h3>
+              <p>Logistica y bodega</p>
+            </div>
+          </article>
+          <article class="home-team__member">
+            <img src="./images/user/user-03.jpg" alt="Valentina Perez" />
+            <div>
+              <h3>Valentina Perez</h3>
+              <p>Atencion a clientes</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="productos" class="home-section home-products">
+        <div class="home-section__header home-section__header--with-action">
+          <div>
+            <p>Productos</p>
+            <h2>Catalogo destacado</h2>
+          </div>
+          <a href="productos.html" class="home-button home-button--catalog">Ver productos</a>
+        </div>
+        <div id="home-products-grid" class="home-products__grid">
+          <article class="home-product-card">
+            <img src="./images/product/product-01.jpg" alt="Producto EcoMarket" />
+            <div>
+              <span>Cargando</span>
+              <h3>Productos disponibles</h3>
+              <p>$0</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="mapa" class="home-section home-map">
+        <div class="home-section__header">
+          <p>Mapa</p>
+          <h2>Ubicacion de referencia</h2>
+        </div>
+        <div class="home-map__layout">
+          <div class="home-map__details">
+            <h3>EcoMarket Santiago</h3>
+            <p>Av. Providencia 1234, Santiago</p>
+            <p>Lunes a viernes, 09:00 a 18:00</p>
+          </div>
+          <iframe
+            title="Mapa EcoMarket"
+            loading="lazy"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=-70.6692%2C-33.4521%2C-70.6425%2C-33.4292&amp;layer=mapnik&amp;marker=-33.4406%2C-70.6550"
+          ></iframe>
+        </div>
+      </section>
+
+      <section id="formulario" class="home-section home-contact">
+        <div class="home-section__header">
+          <p>Formulario</p>
+          <h2>Conversemos</h2>
+        </div>
+        <form class="home-form" id="contact-form">
+          <label>
+            Nombre
+            <input type="text" name="nombre" placeholder="Tu nombre" required />
+          </label>
+          <label>
+            Correo
+            <input type="email" name="correo" placeholder="correo@ejemplo.cl" required />
+          </label>
+          <label>
+            Mensaje
+            <textarea name="mensaje" rows="5" placeholder="Escribe tu mensaje" required></textarea>
+          </label>
+          <p class="home-form__status" id="contact-form-status" aria-live="polite"></p>
+          <button type="submit">Enviar mensaje</button>
+        </form>
+      </section>
+    </main>
+
+    <footer class="home-footer">
+      <p>EcoMarket</p>
+      <span id="year"></span>
+    </footer>
   </body>
 </html>
