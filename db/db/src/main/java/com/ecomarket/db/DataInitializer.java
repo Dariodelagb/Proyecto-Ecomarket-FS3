@@ -59,6 +59,21 @@ public class DataInitializer implements ApplicationRunner {
             jdbcTemplate.execute("ALTER TABLE cliente ADD COLUMN contrasena VARCHAR(150)");
         }
 
+        Integer roleCount = jdbcTemplate.queryForObject(
+            """
+            SELECT COUNT(*)
+            FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = DATABASE()
+              AND TABLE_NAME = 'cliente'
+              AND COLUMN_NAME = 'rol'
+            """,
+            Integer.class
+        );
+
+        if (roleCount != null && roleCount == 0) {
+            jdbcTemplate.execute("ALTER TABLE cliente ADD COLUMN rol VARCHAR(20) DEFAULT 'CLIENTE'");
+        }
+
         jdbcTemplate.update(
             """
             UPDATE cliente
@@ -72,6 +87,14 @@ public class DataInitializer implements ApplicationRunner {
             UPDATE cliente
             SET contrasena = '123456'
             WHERE contrasena IS NULL OR contrasena = ''
+            """
+        );
+
+        jdbcTemplate.update(
+            """
+            UPDATE cliente
+            SET rol = 'CLIENTE'
+            WHERE rol IS NULL OR rol = ''
             """
         );
     }

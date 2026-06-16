@@ -18,8 +18,11 @@ const clearSession = () => {
 
 const getActiveClientId = () => getSession()?.cliente?.id || null;
 
+const isAdminSession = () => getSession()?.cliente?.rol === "ADMIN";
+
 const updateAuthControls = () => {
   const hasSession = Boolean(getSession()?.token);
+  const hasAdminSession = hasSession && isAdminSession();
 
   document.querySelectorAll(".auth-guest-only").forEach((element) => {
     element.hidden = hasSession;
@@ -27,6 +30,10 @@ const updateAuthControls = () => {
 
   document.querySelectorAll(".auth-session-only").forEach((element) => {
     element.hidden = !hasSession;
+  });
+
+  document.querySelectorAll(".auth-admin-only").forEach((element) => {
+    element.hidden = !hasAdminSession;
   });
 };
 
@@ -183,4 +190,4 @@ document.addEventListener("DOMContentLoaded", () => {
   setupLoginForm();
 });
 
-export { clearSession, getActiveClientId, getSession, updateAuthControls };
+export { clearSession, getActiveClientId, getSession, isAdminSession, updateAuthControls };

@@ -21,6 +21,7 @@ import "./components/auth-loader";
 import "./components/products-page-loader";
 import "./components/cart-badge-loader";
 import "./components/cart-page-loader";
+import "./components/checkout-loader";
 
 Alpine.plugin(persist);
 window.Alpine = Alpine;

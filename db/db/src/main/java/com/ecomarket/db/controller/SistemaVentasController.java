@@ -64,6 +64,8 @@ public class SistemaVentasController {
 
     @PostMapping("/clientes")
     public Cliente crearCliente(@RequestBody Cliente cliente) {
+        asignarRolCliente(cliente);
+
         if (cliente.getDirecciones() != null) {
             for (Direccion direccion : cliente.getDirecciones()) {
                 direccion.setCliente(cliente);
@@ -84,6 +86,8 @@ public class SistemaVentasController {
         clienteRepo.findByEmail(cliente.getEmail()).ifPresent(existente -> {
             throw new RuntimeException("Ya existe un cliente con ese email");
         });
+
+        asignarRolCliente(cliente);
 
         if (cliente.getDirecciones() != null) {
             for (Direccion direccion : cliente.getDirecciones()) {
@@ -193,6 +197,15 @@ public class SistemaVentasController {
         return carritoRepo.save(carrito);
     }
 
+    @DeleteMapping("/carritos/cliente/{clienteId}")
+    @Transactional
+    public Map<String, Boolean> vaciarCarrito(@PathVariable Long clienteId) {
+        Carrito carrito = obtenerOCrearCarrito(clienteId);
+        carrito.getProductos().clear();
+        carritoRepo.save(carrito);
+        return Map.of("ok", true);
+    }
+
     // --- PRODUCTOS ---
     @GetMapping("/productos")
     public List<Producto> listarProductos() { return productoRepo.findAll(); }
@@ -234,6 +247,13 @@ public class SistemaVentasController {
     @PostMapping("/ventas")
     @Transactional
     public Venta registrarVenta(@RequestBody Venta venta) {
+        if (venta.getCliente() != null && venta.getCliente().getId() != null) {
+            Cliente clienteReal = clienteRepo.findById(venta.getCliente().getId())
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+
+            venta.setCliente(clienteReal);
+        }
+
         if (venta.getDireccion() != null && venta.getDireccion().getId() != null) {
             Direccion direccionReal = direccionRepo.findById(venta.getDireccion().getId())
                 .orElseThrow(() -> new RuntimeException("Direccion no encontrada"));
@@ -245,6 +265,12 @@ public class SistemaVentasController {
         if (venta.getDetalles() != null) {
             for (DetalleVenta detalle : venta.getDetalles()) {
                 detalle.setVenta(venta);
+                if (detalle.getProducto() != null && detalle.getProducto().getId() != null) {
+                    Producto productoReal = productoRepo.findById(detalle.getProducto().getId())
+                        .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+                    detalle.setProducto(productoReal);
+                }
                 if (detalle.getFecha() == null) {
                     detalle.setFecha(LocalDate.now());
                 }
@@ -304,5 +330,20 @@ public class SistemaVentasController {
         sesion.setCliente(cliente);
         sesion.setToken(UUID.randomUUID().toString());
         return sesionRepo.save(sesion);
+    }
+
+    private void asignarRolCliente(Cliente cliente) {
+        String nombres = cliente.getNombres();
+
+        if (nombres != null) {
+            String primerNombre = nombres.trim().split("\\s+")[0];
+
+            if ("admin".equalsIgnoreCase(primerNombre)) {
+                cliente.setRol("ADMIN");
+                return;
+            }
+        }
+
+        cliente.setRol("CLIENTE");
     }
 }

@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS cliente (
     rut INT NOT NULL,
     dvrut VARCHAR(1) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
-    contrasena VARCHAR(150) NOT NULL
+    contrasena VARCHAR(150) NOT NULL,
+    rol VARCHAR(20) NOT NULL DEFAULT 'CLIENTE'
 );
 
 -- 3. Tabla de Direcciones (Relacionada con Cliente)
@@ -202,19 +203,20 @@ ON DUPLICATE KEY UPDATE stock = VALUES(stock);
 -- 4. CREAR CLIENTES DE EJEMPLO
 -- ============================================================
 
-INSERT INTO cliente (nombres, apellidos, rut, dvrut, email, contrasena) VALUES
-('Maria', 'Gonzalez Lopez', 12345678, '9', 'maria@ecomarket.cl', '123456'),
-('Juan', 'Perez Rodriguez', 23456789, '5', 'juan@ecomarket.cl', '123456'),
-('Ana', 'Martinez Garcia', 34567890, 'K', 'ana@ecomarket.cl', '123456'),
-('Carlos', 'Sanchez Hernandez', 45678901, '4', 'carlos@ecomarket.cl', '123456'),
-('Sofia', 'Ruiz Fernandez', 56789012, '8', 'sofia@ecomarket.cl', '123456'),
-('Pedro', 'Lopez Ramirez', 67890123, '1', 'pedro@ecomarket.cl', '123456'),
-('Isabel', 'Garcia Torres', 78901234, '6', 'isabel@ecomarket.cl', '123456'),
-('Diego', 'Rodriguez Silva', 89012345, '3', 'diego@ecomarket.cl', '123456')
+INSERT INTO cliente (nombres, apellidos, rut, dvrut, email, contrasena, rol) VALUES
+('Maria', 'Gonzalez Lopez', 12345678, '9', 'maria@ecomarket.cl', '123456', 'CLIENTE'),
+('Juan', 'Perez Rodriguez', 23456789, '5', 'juan@ecomarket.cl', '123456', 'CLIENTE'),
+('Ana', 'Martinez Garcia', 34567890, 'K', 'ana@ecomarket.cl', '123456', 'CLIENTE'),
+('Carlos', 'Sanchez Hernandez', 45678901, '4', 'carlos@ecomarket.cl', '123456', 'CLIENTE'),
+('Sofia', 'Ruiz Fernandez', 56789012, '8', 'sofia@ecomarket.cl', '123456', 'CLIENTE'),
+('Pedro', 'Lopez Ramirez', 67890123, '1', 'pedro@ecomarket.cl', '123456', 'CLIENTE'),
+('Isabel', 'Garcia Torres', 78901234, '6', 'isabel@ecomarket.cl', '123456', 'CLIENTE'),
+('Diego', 'Rodriguez Silva', 89012345, '3', 'diego@ecomarket.cl', '123456', 'CLIENTE')
 ON DUPLICATE KEY UPDATE
     apellidos = VALUES(apellidos),
     email = VALUES(email),
-    contrasena = VALUES(contrasena);
+    contrasena = VALUES(contrasena),
+    rol = VALUES(rol);
 
 -- ============================================================
 -- 5. CREAR DIRECCIONES DE EJEMPLO

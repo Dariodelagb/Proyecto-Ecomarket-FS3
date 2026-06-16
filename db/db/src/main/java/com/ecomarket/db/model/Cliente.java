@@ -18,6 +18,7 @@ public class Cliente {
     private Integer rut;
     private String dvrut;
     private String email;
+    private String rol = "CLIENTE";
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String contrasena;
@@ -26,4 +27,14 @@ public class Cliente {
     @lombok.ToString.Exclude
     @lombok.EqualsAndHashCode.Exclude
     private List<Direccion> direcciones;
+
+    @PrePersist
+    @PreUpdate
+    public void normalizarRol() {
+        if (rol == null || rol.isBlank()) {
+            rol = "CLIENTE";
+        }
+
+        rol = rol.toUpperCase();
+    }
 }
