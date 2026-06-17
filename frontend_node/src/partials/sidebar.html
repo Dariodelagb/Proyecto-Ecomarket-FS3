@@ -9,19 +9,19 @@
   >
     <a href="index.html">
       <span class="logo" :class="sidebarToggle ? 'hidden' : ''">
-        <img class="dark:hidden" src="./images/logo/logo.svg" alt="Logo" />
+        <img class="h-12 w-auto dark:hidden" src="./images/logo/ecomarket_logo.png" alt="EcoMarket" />
         <img
-          class="hidden dark:block"
-          src="./images/logo/logo-dark.svg"
-          alt="Logo"
+          class="hidden h-12 w-auto dark:block"
+          src="./images/logo/ecomarket_logo.png"
+          alt="EcoMarket"
         />
       </span>
 
       <img
-        class="logo-icon"
+        class="logo-icon h-10 w-10 object-contain"
         :class="sidebarToggle ? 'lg:block' : 'hidden'"
-        src="./images/logo/logo-icon.svg"
-        alt="Logo"
+        src="./images/logo/ecomarket_logo.png"
+        alt="EcoMarket"
       />
     </a>
   </div>
@@ -235,6 +235,15 @@
                     :class="page === 'basicTables' ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'"
                   >
                     Tabla de Productos
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="dashboard.html#tabla-usuarios"
+                    class="menu-dropdown-item group"
+                    :class="page === 'basicTables' ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'"
+                  >
+                    Tabla de Usuarios
                   </a>
                 </li>
               </ul>

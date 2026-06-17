@@ -11,7 +11,10 @@
   </head>
   <body class="home-page">
     <header class="home-nav">
-      <a href="#home" class="home-brand">EcoMarket</a>
+      <a href="#home" class="home-brand">
+        <img src="./images/logo/ecomarket_logo.png" alt="" class="home-brand__logo" />
+        <span>EcoMarket</span>
+      </a>
       <nav class="home-menu" aria-label="Navegacion principal">
         <a href="#home">Home</a>
         <a href="#equipo">Equipo</a>
@@ -38,46 +41,20 @@
         <div class="home-hero__media" aria-hidden="true"></div>
         <div class="home-hero__overlay"></div>
         <div class="home-hero__content">
-          <p class="home-kicker">Cosmetica, cuidado personal y productos reutilizables</p>
           <h1>EcoMarket</h1>
+          <p class="home-kicker">Cosmetica, cuidado personal y productos reutilizables</p>
           <p>
-            Productos seleccionados para una rutina mas consciente, con inventario
-            actualizado y categorias claras para comprar sin vueltas.
+            Productos seleccionados para una rutina mas consciente, hecho 100% con ingredientes naturales y ecologicos.
           </p>
+          <div
+            id="home-featured-carousel"
+            class="home-featured-carousel"
+            aria-label="Productos destacados"
+          ></div>
           <div class="home-actions">
             <a href="productos.html" class="home-button home-button--primary">Ver productos</a>
             <a href="#formulario" class="home-button home-button--secondary">Contactar</a>
           </div>
-        </div>
-      </section>
-
-      <section id="equipo" class="home-section home-team">
-        <div class="home-section__header">
-          <p>Equipo</p>
-          <h2>Personas detras de cada entrega</h2>
-        </div>
-        <div class="home-team__grid">
-          <article class="home-team__member">
-            <img src="./images/user/user-01.jpg" alt="Camila Torres" />
-            <div>
-              <h3>Camila Torres</h3>
-              <p>Operacion y catalogo</p>
-            </div>
-          </article>
-          <article class="home-team__member">
-            <img src="./images/user/user-02.jpg" alt="Matias Rojas" />
-            <div>
-              <h3>Matias Rojas</h3>
-              <p>Logistica y bodega</p>
-            </div>
-          </article>
-          <article class="home-team__member">
-            <img src="./images/user/user-03.jpg" alt="Valentina Perez" />
-            <div>
-              <h3>Valentina Perez</h3>
-              <p>Atencion a clientes</p>
-            </div>
-          </article>
         </div>
       </section>
 
@@ -91,7 +68,6 @@
         </div>
         <div id="home-products-grid" class="home-products__grid">
           <article class="home-product-card">
-            <img src="./images/product/product-01.jpg" alt="Producto EcoMarket" />
             <div>
               <span>Cargando</span>
               <h3>Productos disponibles</h3>
@@ -109,7 +85,7 @@
         <div class="home-map__layout">
           <div class="home-map__details">
             <h3>EcoMarket Santiago</h3>
-            <p>Av. Providencia 1234, Santiago</p>
+            <p>Teatinos 599, Santiago</p>
             <p>Lunes a viernes, 09:00 a 18:00</p>
           </div>
           <iframe
@@ -117,6 +93,36 @@
             loading="lazy"
             src="https://www.openstreetmap.org/export/embed.html?bbox=-70.6692%2C-33.4521%2C-70.6425%2C-33.4292&amp;layer=mapnik&amp;marker=-33.4406%2C-70.6550"
           ></iframe>
+        </div>
+      </section>
+
+      <section id="equipo" class="home-section home-team">
+        <div class="home-section__header">
+          <p>Equipo</p>
+          <h2>Personas detras del equipo</h2>
+        </div>
+        <div class="home-team__grid">
+          <article class="home-team__member">
+            <img src="./images/user/user-01.jpg" alt="Camila Torres" />
+            <div>
+              <h3>Dario Jeria</h3>
+              <p>Dueño y Desarrollador</p>
+            </div>
+          </article>
+          <article class="home-team__member">
+            <img src="./images/user/user-02.jpg" alt="Matias Rojas" />
+            <div>
+              <h3>Matias Rojas</h3>
+              <p>Logistica y bodega</p>
+            </div>
+          </article>
+          <article class="home-team__member">
+            <img src="./images/user/user-03.jpg" alt="Valentina Perez" />
+            <div>
+              <h3>Valentina Perez</h3>
+              <p>Quimica y Productos</p>
+            </div>
+          </article>
         </div>
       </section>
 

@@ -1,4 +1,6 @@
 // Función para formatear números con separador de miles
+import { getProductImage } from "./product-image-resolver";
+
 function formatNumber(num) {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
@@ -6,13 +8,24 @@ function formatNumber(num) {
 // Cargar productos en la tabla
 async function loadProductsTable() {
   try {
-    const tableBody = document.querySelector("table tbody");
+    const tableBody = document.getElementById("products-table-body");
     if (!tableBody) return;
 
-    const response = await fetch("/api/productos");
-    if (!response.ok) throw new Error("Error al obtener productos");
+    const [productsResponse, stockResponse] = await Promise.all([
+      fetch("/api/productos"),
+      fetch("/api/stock-producto"),
+    ]);
 
-    const productos = await response.json();
+    if (!productsResponse.ok) throw new Error("Error al obtener productos");
+    if (!stockResponse.ok) throw new Error("Error al obtener stock");
+
+    const productos = await productsResponse.json();
+    const stockProductos = await stockResponse.json();
+    const stockByProductId = new Map(
+      stockProductos
+        .filter((item) => item.producto?.id)
+        .map((item) => [item.producto.id, item.stock]),
+    );
 
     // Limpiar filas existentes (mantener solo estructura)
     tableBody.innerHTML = "";
@@ -23,6 +36,7 @@ async function loadProductsTable() {
       const categoriaNombre = prod.categoria
         ? prod.categoria.categoria
         : "Sin categoría";
+      const stock = stockByProductId.get(prod.id) ?? 0;
       const estado = "Disponible"; // Puedes cambiar esto según lógica de negocio
 
       row.innerHTML = `
@@ -30,7 +44,7 @@ async function loadProductsTable() {
           <div class="flex items-center">
             <div class="flex items-center gap-3">
               <div class="h-[50px] w-[50px] overflow-hidden rounded-md bg-gray-200">
-                <img src="./images/product/product-01.jpg" alt="${prod.nombre}" class="w-full h-full object-cover" />
+                <img src="${getProductImage(prod)}" alt="${prod.nombre}" class="w-full h-full object-cover" />
               </div>
               <div>
                 <p class="font-medium text-gray-800 text-theme-sm dark:text-white/90">
@@ -54,6 +68,13 @@ async function loadProductsTable() {
           <div class="flex items-center">
             <p class="text-gray-500 text-theme-sm dark:text-gray-400">
               $${formatNumber(prod.precio || 0)}
+            </p>
+          </div>
+        </td>
+        <td>
+          <div class="flex items-center">
+            <p class="rounded-full bg-brand-50 px-2 py-0.5 text-theme-xs font-medium text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">
+              ${formatNumber(stock)}
             </p>
           </div>
         </td>

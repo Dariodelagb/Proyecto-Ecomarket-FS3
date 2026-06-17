@@ -1,22 +1,10 @@
-import product01 from "../../images/product/product-01.jpg";
-import product02 from "../../images/product/product-02.jpg";
-import product03 from "../../images/product/product-03.jpg";
-import product04 from "../../images/product/product-04.jpg";
-import product05 from "../../images/product/product-05.jpg";
-import { getActiveClientId } from "./auth-loader";
+import { validateSession } from "./auth-loader";
 import { updateCartBadge } from "./cart-badge-loader";
-
-const productImages = [
-  product01,
-  product02,
-  product03,
-  product04,
-  product05,
-];
+import { getProductImage } from "./product-image-resolver";
 
 const fallbackProducts = [
   { nombre: "Perfume natural", precio: 8500, categoria: { categoria: "Perfumes" } },
-  { nombre: "Base maquillante", precio: 12000, categoria: { categoria: "Maquillaje" } },
+  { nombre: "Bloqueador solar", precio: 11900, categoria: { categoria: "Bloqueadores" } },
   { nombre: "Jabon artesanal", precio: 6500, categoria: { categoria: "Jabones" } },
   { nombre: "Botella reutilizable", precio: 9800, categoria: { categoria: "Botellas" } },
 ];
@@ -36,6 +24,44 @@ const escapeHtml = (value) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 
+const getCategoryName = (product) => product.categoria?.categoria || "Sin categoria";
+
+const groupProductsByCategory = (products) =>
+  products.reduce((groups, product) => {
+    const category = getCategoryName(product);
+
+    if (!groups.has(category)) {
+      groups.set(category, []);
+    }
+
+    groups.get(category).push(product);
+    return groups;
+  }, new Map());
+
+const renderProductCard = (product) => {
+  const category = getCategoryName(product);
+  const image = getProductImage(product);
+
+  return `
+    <article class="home-product-card products-page-card">
+      <img src="${image}" alt="${escapeHtml(product.nombre)}" />
+      <div>
+        <span>${escapeHtml(category)}</span>
+        <h3>${escapeHtml(product.nombre)}</h3>
+        <p>${formatPrice(product.precio)}</p>
+        <button
+          type="button"
+          class="product-add-button"
+          data-product-id="${product.id || ""}"
+          ${product.id ? "" : "disabled"}
+        >
+          Agregar al carrito
+        </button>
+      </div>
+    </article>
+  `;
+};
+
 const renderProductsPage = (products) => {
   const grid = document.getElementById("products-page-grid");
   const count = document.getElementById("products-page-count");
@@ -46,28 +72,23 @@ const renderProductsPage = (products) => {
     count.textContent = `${products.length} productos`;
   }
 
-  grid.innerHTML = products
-    .map((product, index) => {
-      const category = product.categoria?.categoria || "Sin categoria";
-      const image = productImages[index % productImages.length];
+  const groupedProducts = groupProductsByCategory(products);
 
+  grid.innerHTML = [...groupedProducts.entries()]
+    .map(([category, categoryProducts]) => {
       return `
-        <article class="home-product-card products-page-card">
-          <img src="${image}" alt="${escapeHtml(product.nombre)}" />
-          <div>
-            <span>${escapeHtml(category)}</span>
-            <h3>${escapeHtml(product.nombre)}</h3>
-            <p>${formatPrice(product.precio)}</p>
-            <button
-              type="button"
-              class="product-add-button"
-              data-product-id="${product.id || ""}"
-              ${product.id ? "" : "disabled"}
-            >
-              Agregar al carrito
-            </button>
+        <section class="products-category-section">
+          <div class="products-category-heading">
+            <div>
+              <p>Categoria</p>
+              <h3>${escapeHtml(category)}</h3>
+            </div>
+            <span>${categoryProducts.length} productos</span>
           </div>
-        </article>
+          <div class="products-category-grid">
+            ${categoryProducts.map(renderProductCard).join("")}
+          </div>
+        </section>
       `;
     })
     .join("");
@@ -97,7 +118,9 @@ const setupAddToCart = () => {
     const button = event.target.closest("[data-product-id]");
     if (!button || !button.dataset.productId) return;
 
-    const clientId = getActiveClientId();
+    const session = await validateSession();
+    const clientId = session?.cliente?.id;
+
     if (!clientId) {
       window.location.href = "login.html";
       return;

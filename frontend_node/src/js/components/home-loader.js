@@ -1,20 +1,8 @@
-import product01 from "../../images/product/product-01.jpg";
-import product02 from "../../images/product/product-02.jpg";
-import product03 from "../../images/product/product-03.jpg";
-import product04 from "../../images/product/product-04.jpg";
-import product05 from "../../images/product/product-05.jpg";
-
-const productImages = [
-  product01,
-  product02,
-  product03,
-  product04,
-  product05,
-];
+import { getProductImage } from "./product-image-resolver";
 
 const fallbackProducts = [
   { nombre: "Perfume natural", precio: 8500, categoria: { categoria: "Perfumes" } },
-  { nombre: "Base maquillante", precio: 12000, categoria: { categoria: "Maquillaje" } },
+  { nombre: "Bloqueador solar", precio: 11900, categoria: { categoria: "Bloqueadores" } },
   { nombre: "Jabon artesanal", precio: 6500, categoria: { categoria: "Jabones" } },
 ];
 
@@ -33,6 +21,9 @@ const escapeHtml = (value) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 
+let carouselTimer = null;
+let carouselIndex = 0;
+
 const renderProducts = (products) => {
   const grid = document.getElementById("home-products-grid");
   if (!grid) return;
@@ -40,9 +31,9 @@ const renderProducts = (products) => {
   const visibleProducts = products.slice(0, 6);
 
   grid.innerHTML = visibleProducts
-    .map((product, index) => {
+    .map((product) => {
       const category = product.categoria?.categoria || "Producto";
-      const image = productImages[index % productImages.length];
+      const image = getProductImage(product);
 
       return `
         <article class="home-product-card">
@@ -58,19 +49,83 @@ const renderProducts = (products) => {
     .join("");
 };
 
+const renderFeaturedCarousel = (products) => {
+  const carousel = document.getElementById("home-featured-carousel");
+  if (!carousel) return;
+
+  const featuredProducts = products.slice(0, 4);
+  if (!featuredProducts.length) {
+    carousel.innerHTML = "";
+    return;
+  }
+
+  carouselIndex = 0;
+  if (carouselTimer) {
+    clearInterval(carouselTimer);
+  }
+
+  carousel.innerHTML = `
+    <div class="home-featured-carousel__viewport">
+      <div class="home-featured-carousel__track">
+        ${featuredProducts
+          .map((product) => {
+            const category = product.categoria?.categoria || "Producto";
+            const image = getProductImage(product);
+
+            return `
+              <article class="home-featured-slide">
+                <img src="${image}" alt="${escapeHtml(product.nombre)}" />
+                <div>
+                  <span>${escapeHtml(category)}</span>
+                  <h2>${escapeHtml(product.nombre)}</h2>
+                  <p>${formatPrice(product.precio)}</p>
+                </div>
+              </article>
+            `;
+          })
+          .join("")}
+      </div>
+    </div>
+    <div class="home-featured-carousel__dots" aria-hidden="true">
+      ${featuredProducts.map((_, index) => `<span class="${index === 0 ? "is-active" : ""}"></span>`).join("")}
+    </div>
+  `;
+
+  const track = carousel.querySelector(".home-featured-carousel__track");
+  const dots = [...carousel.querySelectorAll(".home-featured-carousel__dots span")];
+
+  const updateCarousel = () => {
+    if (!track) return;
+
+    track.style.transform = `translateX(-${carouselIndex * 100}%)`;
+    dots.forEach((dot, index) => {
+      dot.classList.toggle("is-active", index === carouselIndex);
+    });
+  };
+
+  carouselTimer = setInterval(() => {
+    carouselIndex = (carouselIndex + 1) % featuredProducts.length;
+    updateCarousel();
+  }, 3200);
+};
+
 const loadHomeProducts = async () => {
   const grid = document.getElementById("home-products-grid");
-  if (!grid) return;
+  const carousel = document.getElementById("home-featured-carousel");
+  if (!grid && !carousel) return;
 
   try {
     const response = await fetch("/api/productos");
     if (!response.ok) throw new Error("No se pudieron cargar productos");
 
     const products = await response.json();
-    renderProducts(products.length ? products : fallbackProducts);
+    const visibleProducts = products.length ? products : fallbackProducts;
+    renderProducts(visibleProducts);
+    renderFeaturedCarousel(visibleProducts);
   } catch (error) {
     console.error("Error cargando productos de la home:", error);
     renderProducts(fallbackProducts);
+    renderFeaturedCarousel(fallbackProducts);
   }
 };
 

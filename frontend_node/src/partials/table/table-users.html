@@ -1,0 +1,70 @@
+<div
+  id="tabla-usuarios"
+  class="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6"
+>
+  <div
+    class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <div>
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">
+        Tabla de Usuarios
+      </h3>
+    </div>
+  </div>
+
+  <div class="w-full overflow-x-auto">
+    <table class="min-w-full">
+      <thead>
+        <tr class="border-y border-gray-100 dark:border-gray-800">
+          <th class="py-3">
+            <div class="flex items-center">
+              <p
+                class="text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+              >
+                Usuario
+              </p>
+            </div>
+          </th>
+          <th class="py-3">
+            <div class="flex items-center">
+              <p
+                class="text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+              >
+                RUT
+              </p>
+            </div>
+          </th>
+          <th class="py-3">
+            <div class="flex items-center">
+              <p
+                class="text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+              >
+                Correo
+              </p>
+            </div>
+          </th>
+          <th class="py-3">
+            <div class="flex items-center">
+              <p
+                class="text-theme-xs font-medium text-gray-500 dark:text-gray-400"
+              >
+                Rol
+              </p>
+            </div>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody
+        id="users-table-body"
+        class="divide-y divide-gray-100 dark:divide-gray-800"
+      >
+        <tr>
+          <td class="py-4 text-theme-sm text-gray-500" colspan="4">
+            Cargando usuarios...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

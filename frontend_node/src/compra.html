@@ -8,7 +8,10 @@
   </head>
   <body class="home-page checkout-page">
     <header class="home-nav">
-      <a href="index.html#home" class="home-brand">EcoMarket</a>
+      <a href="index.html#home" class="home-brand">
+        <img src="./images/logo/ecomarket_logo.png" alt="" class="home-brand__logo" />
+        <span>EcoMarket</span>
+      </a>
       <nav class="home-menu" aria-label="Navegacion principal">
         <a href="index.html#home">Home</a>
         <a href="index.html#equipo">Equipo</a>
@@ -47,7 +50,7 @@
               <p class="checkout-panel__kicker">Datos del cliente</p>
               <div class="checkout-grid">
                 <label>Nombre completo<input name="nombreCompleto" type="text" required /></label>
-                <label>RUT<input name="rut" type="number" required /></label>
+                <label>RUT<input name="rut" type="text" inputmode="numeric" maxlength="8" pattern="[0-9]{1,8}" required /></label>
                 <label>DV<input name="dvrut" type="text" maxlength="1" required /></label>
                 <label>Correo<input name="email" type="email" required /></label>
               </div>
@@ -59,11 +62,18 @@
                 Selecciona direccion
                 <select name="direccionId" id="checkout-address-select"></select>
               </label>
+              <button
+                type="button"
+                class="checkout-secondary-button"
+                id="checkout-add-address-toggle"
+              >
+                Agregar otra direccion
+              </button>
 
               <div id="checkout-address-form" class="checkout-address-form" hidden>
                 <div class="checkout-grid">
                   <label>Calle<input name="calle" type="text" /></label>
-                  <label>Numero<input name="numero" type="text" /></label>
+                  <label>Numero<input name="numero" type="text" maxlength="8" /></label>
                   <label>Comuna<input name="comuna" type="text" /></label>
                   <label>Ciudad<input name="ciudad" type="text" /></label>
                   <label>Region<input name="region" type="text" /></label>
@@ -76,7 +86,7 @@
               <p class="checkout-panel__kicker">Datos de compra</p>
               <div class="checkout-grid">
                 <label>Numero de tarjeta<input name="tarjeta" type="text" inputmode="numeric" minlength="12" maxlength="19" required /></label>
-                <label>Fecha exp.<input name="expiracion" type="text" placeholder="MM/AA" maxlength="5" required /></label>
+                <label>Fecha exp.<input name="expiracion" type="text" inputmode="numeric" placeholder="MMAA" maxlength="4" pattern="[0-9]{4}" required /></label>
                 <label>CVV<input name="cvv" type="password" inputmode="numeric" minlength="3" maxlength="4" required /></label>
                 <label>Nombre en tarjeta<input name="titular" type="text" required /></label>
               </div>

@@ -21,6 +21,7 @@ public class DataInitializer implements ApplicationRunner {
         migrateContactoSchema();
         migrateDireccionSchema();
         migrateCarritoSchema();
+        migrateStockProductoSchema();
         migrateDetalleVentaFecha();
         seedCategorias();
         seedDirecciones();
@@ -180,6 +181,40 @@ public class DataInitializer implements ApplicationRunner {
         );
     }
 
+    private void migrateStockProductoSchema() {
+        jdbcTemplate.execute(
+            """
+            CREATE TABLE IF NOT EXISTS stock_producto (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                stock INT NOT NULL,
+                producto_id BIGINT UNIQUE
+            )
+            """
+        );
+
+        Integer oldTableCount = jdbcTemplate.queryForObject(
+            """
+            SELECT COUNT(*)
+            FROM information_schema.TABLES
+            WHERE TABLE_SCHEMA = DATABASE()
+              AND TABLE_NAME = 'bodega'
+            """,
+            Integer.class
+        );
+
+        if (oldTableCount != null && oldTableCount > 0) {
+            jdbcTemplate.update(
+                """
+                INSERT INTO stock_producto (stock, producto_id)
+                SELECT b.stock, b.producto_id
+                FROM bodega b
+                WHERE b.producto_id IS NOT NULL
+                ON DUPLICATE KEY UPDATE stock = VALUES(stock)
+                """
+            );
+        }
+    }
+
     private void migrateDetalleVentaFecha() {
         Integer columnCount = jdbcTemplate.queryForObject(
             """
@@ -200,9 +235,10 @@ public class DataInitializer implements ApplicationRunner {
     private void seedCategorias() {
         Object[][] categorias = {
             {1L, "Perfumes"},
-            {2L, "Maquillaje"},
+            {2L, "Bloqueadores"},
             {3L, "Jabones"},
-            {4L, "Botellas"}
+            {4L, "Botellas"},
+            {5L, "Aceites Herbales"}
         };
 
         for (Object[] categoria : categorias) {

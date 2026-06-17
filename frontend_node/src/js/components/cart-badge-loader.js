@@ -1,10 +1,12 @@
-import { getActiveClientId } from "./auth-loader";
+import { validateSession } from "./auth-loader";
 
 const updateCartBadge = async () => {
   const badge = document.getElementById("cart-count");
   if (!badge) return;
 
-  const clientId = getActiveClientId();
+  const session = await validateSession();
+  const clientId = session?.cliente?.id;
+
   if (!clientId) {
     badge.textContent = "0";
     return;

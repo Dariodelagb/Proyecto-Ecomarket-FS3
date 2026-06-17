@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ecomarket.db.model.Bodega;
 import com.ecomarket.db.model.Boleta;
 import com.ecomarket.db.model.Carrito;
 import com.ecomarket.db.model.CategoriaProducto;
@@ -26,8 +25,8 @@ import com.ecomarket.db.model.DetalleVenta;
 import com.ecomarket.db.model.Direccion;
 import com.ecomarket.db.model.Producto;
 import com.ecomarket.db.model.SesionCliente;
+import com.ecomarket.db.model.StockProducto;
 import com.ecomarket.db.model.Venta;
-import com.ecomarket.db.repository.BodegaRepository;
 import com.ecomarket.db.repository.BoletaRepository;
 import com.ecomarket.db.repository.CarritoRepository;
 import com.ecomarket.db.repository.CategoriaRepository;
@@ -36,6 +35,7 @@ import com.ecomarket.db.repository.ContactoRepository;
 import com.ecomarket.db.repository.DireccionRepository;
 import com.ecomarket.db.repository.ProductoRepository;
 import com.ecomarket.db.repository.SesionClienteRepository;
+import com.ecomarket.db.repository.StockProductoRepository;
 import com.ecomarket.db.repository.VentaRepository;
 
 @RestController
@@ -44,7 +44,7 @@ public class SistemaVentasController {
 
     @Autowired private ClienteRepository clienteRepo;
     @Autowired private ProductoRepository productoRepo;
-    @Autowired private BodegaRepository bodegaRepo;
+    @Autowired private StockProductoRepository stockProductoRepo;
     @Autowired private VentaRepository ventaRepo;
     @Autowired private BoletaRepository boletaRepo;
     @Autowired private CategoriaRepository categoriaRepo;
@@ -222,25 +222,29 @@ public class SistemaVentasController {
         return productoRepo.save(producto);
     }
 
-    // --- BODEGA ---
-    @GetMapping("/bodega")
-    public List<Bodega> verStockGlobal() { return bodegaRepo.findAll(); }
+    // --- STOCK PRODUCTO ---
+    @GetMapping({"/stock-producto", "/bodega"})
+    public List<StockProducto> verStockGlobal() { return stockProductoRepo.findAll(); }
 
-    @PostMapping("/bodega")
-    public Bodega crearBodega(@RequestBody Bodega bodega) {
-        // Revisar si el producto existe antes de crear la bodega
-        if (bodega.getProducto() == null || bodega.getProducto().getId() == null) {
-            throw new RuntimeException("Debe asignar un producto válido a la bodega");
+    @PostMapping({"/stock-producto", "/bodega"})
+    public StockProducto crearStockProducto(@RequestBody StockProducto stockProducto) {
+        if (stockProducto.getProducto() == null || stockProducto.getProducto().getId() == null) {
+            throw new RuntimeException("Debe asignar un producto válido al stock");
         }
-        
-        return bodegaRepo.save(bodega);
+
+        Producto productoReal = productoRepo.findById(stockProducto.getProducto().getId())
+            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        stockProducto.setProducto(productoReal);
+
+        return stockProductoRepo.save(stockProducto);
     }
 
-    @PatchMapping("/bodega/{id}")
-    public Bodega actualizarStock(@PathVariable Long id, @RequestBody Map<String, Integer> body) {
-        Bodega b = bodegaRepo.findById(id).orElseThrow();
-        b.setStock(body.get("stock"));
-        return bodegaRepo.save(b);
+    @PatchMapping({"/stock-producto/{id}", "/bodega/{id}"})
+    public StockProducto actualizarStock(@PathVariable Long id, @RequestBody Map<String, Integer> body) {
+        StockProducto stockProducto = stockProductoRepo.findById(id).orElseThrow();
+        stockProducto.setStock(body.get("stock"));
+        return stockProductoRepo.save(stockProducto);
     }
 
     // --- VENTAS ---

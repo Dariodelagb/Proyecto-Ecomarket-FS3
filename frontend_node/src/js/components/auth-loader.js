@@ -20,6 +20,20 @@ const getActiveClientId = () => getSession()?.cliente?.id || null;
 
 const isAdminSession = () => getSession()?.cliente?.rol === "ADMIN";
 
+const enforceDigits = (input, maxLength) => {
+  if (!input) return;
+
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/\D/g, "").slice(0, maxLength);
+  });
+};
+
+const setupInputConstraints = () => {
+  document.querySelectorAll('input[name="rut"]').forEach((input) => {
+    enforceDigits(input, 8);
+  });
+};
+
 const updateAuthControls = () => {
   const hasSession = Boolean(getSession()?.token);
   const hasAdminSession = hasSession && isAdminSession();
@@ -35,6 +49,36 @@ const updateAuthControls = () => {
   document.querySelectorAll(".auth-admin-only").forEach((element) => {
     element.hidden = !hasAdminSession;
   });
+};
+
+const validateSession = async () => {
+  const session = getSession();
+  if (!session?.token) return null;
+
+  try {
+    const response = await fetch(`/api/auth/sesion/${encodeURIComponent(session.token)}`);
+
+    if (!response.ok) {
+      clearSession();
+      updateAuthControls();
+      return null;
+    }
+
+    const freshSession = await response.json();
+
+    if (!freshSession?.cliente?.id) {
+      clearSession();
+      updateAuthControls();
+      return null;
+    }
+
+    setSession(freshSession);
+    updateAuthControls();
+    return freshSession;
+  } catch (error) {
+    console.error("Error validando sesion:", error);
+    return session;
+  }
 };
 
 const setupLogout = () => {
@@ -184,10 +228,12 @@ const setupLoginForm = () => {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+  setupInputConstraints();
   updateAuthControls();
   setupLogout();
   setupRegisterForm();
   setupLoginForm();
+  validateSession();
 });
 
-export { clearSession, getActiveClientId, getSession, isAdminSession, updateAuthControls };
+export { clearSession, getActiveClientId, getSession, isAdminSession, updateAuthControls, validateSession };

@@ -1,12 +1,6 @@
-import product01 from "../../images/product/product-01.jpg";
-import product02 from "../../images/product/product-02.jpg";
-import product03 from "../../images/product/product-03.jpg";
-import product04 from "../../images/product/product-04.jpg";
-import product05 from "../../images/product/product-05.jpg";
-import { getActiveClientId, getSession } from "./auth-loader";
+import { getSession, validateSession } from "./auth-loader";
 import { updateCartBadge } from "./cart-badge-loader";
-
-const productImages = [product01, product02, product03, product04, product05];
+import { getProductImage } from "./product-image-resolver";
 
 let currentCart = null;
 let currentDirections = [];
@@ -28,6 +22,24 @@ const escapeHtml = (value) =>
 
 const getCartTotal = (products) =>
   products.reduce((total, product) => total + (product.precio || 0), 0);
+
+const enforceDigits = (input, maxLength) => {
+  if (!input) return;
+
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/\D/g, "").slice(0, maxLength);
+  });
+};
+
+const setupInputConstraints = () => {
+  const form = document.getElementById("checkout-form");
+  if (!form) return;
+
+  enforceDigits(form.rut, 8);
+  enforceDigits(form.expiracion, 4);
+  enforceDigits(form.tarjeta, 19);
+  enforceDigits(form.cvv, 4);
+};
 
 const getResponseMessage = async (response, fallback) => {
   try {
@@ -83,8 +95,8 @@ const renderSummary = () => {
   if (!list) return;
 
   list.innerHTML = products
-    .map((product, index) => {
-      const image = productImages[index % productImages.length];
+    .map((product) => {
+      const image = getProductImage(product);
 
       return `
         <article class="checkout-item">
@@ -99,26 +111,49 @@ const renderSummary = () => {
     .join("");
 };
 
+const setNewAddressRequired = (required) => {
+  const addressForm = document.getElementById("checkout-address-form");
+  if (!addressForm) return;
+
+  addressForm.querySelectorAll("input").forEach((input) => {
+    input.required = required && input.name !== "referencia";
+  });
+};
+
+const setNewAddressMode = (enabled) => {
+  const selectWrap = document.getElementById("checkout-address-select-wrap");
+  const addressForm = document.getElementById("checkout-address-form");
+  const toggle = document.getElementById("checkout-add-address-toggle");
+
+  if (!addressForm) return;
+
+  addressForm.hidden = !enabled;
+  setNewAddressRequired(enabled);
+
+  if (selectWrap) {
+    selectWrap.hidden = enabled || !currentDirections.length;
+  }
+
+  if (toggle) {
+    toggle.hidden = !currentDirections.length;
+    toggle.textContent = enabled ? "Usar direccion guardada" : "Agregar otra direccion";
+  }
+};
+
+const shouldUseNewAddress = () => {
+  const addressForm = document.getElementById("checkout-address-form");
+  return Boolean(addressForm && !addressForm.hidden);
+};
+
 const renderDirections = () => {
   const selectWrap = document.getElementById("checkout-address-select-wrap");
   const select = document.getElementById("checkout-address-select");
-  const addressForm = document.getElementById("checkout-address-form");
-  if (!selectWrap || !select || !addressForm) return;
+  if (!selectWrap || !select) return;
 
   if (!currentDirections.length) {
-    selectWrap.hidden = true;
-    addressForm.hidden = false;
-    addressForm.querySelectorAll("input").forEach((input) => {
-      if (input.name !== "referencia") input.required = true;
-    });
+    setNewAddressMode(true);
     return;
   }
-
-  selectWrap.hidden = false;
-  addressForm.hidden = true;
-  addressForm.querySelectorAll("input").forEach((input) => {
-    input.required = false;
-  });
 
   select.innerHTML = currentDirections
     .map(
@@ -129,13 +164,17 @@ const renderDirections = () => {
       `,
     )
     .join("");
+
+  setNewAddressMode(false);
 };
 
 const loadCheckout = async () => {
   const form = document.getElementById("checkout-form");
   if (!form) return;
 
-  const clientId = getActiveClientId();
+  const session = await validateSession();
+  const clientId = session?.cliente?.id;
+
   if (!clientId) {
     showCheckoutMessage(
       "Inicia sesion para comprar",
@@ -191,7 +230,7 @@ const getNewAddressPayload = (form) => ({
 });
 
 const resolveAddress = async (form, clientId) => {
-  if (currentDirections.length) {
+  if (currentDirections.length && !shouldUseNewAddress()) {
     return { id: Number(form.direccionId.value) };
   }
 
@@ -209,9 +248,25 @@ const resolveAddress = async (form, clientId) => {
   return response.json();
 };
 
+const setupAddressToggle = () => {
+  const toggle = document.getElementById("checkout-add-address-toggle");
+  if (!toggle) return;
+
+  toggle.addEventListener("click", () => {
+    const addressForm = document.getElementById("checkout-address-form");
+    setNewAddressMode(addressForm?.hidden ?? true);
+  });
+};
+
 const createSale = async (form) => {
-  const clientId = getActiveClientId();
+  const session = await validateSession();
+  const clientId = session?.cliente?.id;
   const products = currentCart?.productos || [];
+
+  if (!clientId) {
+    throw new Error("Debes iniciar sesion para completar la compra");
+  }
+
   const direccion = await resolveAddress(form, clientId);
 
   const payload = {
@@ -241,7 +296,9 @@ const createSale = async (form) => {
 };
 
 const clearCart = async () => {
-  const clientId = getActiveClientId();
+  const session = await validateSession();
+  const clientId = session?.cliente?.id;
+
   if (!clientId) return;
 
   await fetch(`/api/carritos/cliente/${clientId}`, { method: "DELETE" });
@@ -281,6 +338,8 @@ const setupCheckoutSubmit = () => {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+  setupInputConstraints();
+  setupAddressToggle();
   loadCheckout();
   setupCheckoutSubmit();
 });

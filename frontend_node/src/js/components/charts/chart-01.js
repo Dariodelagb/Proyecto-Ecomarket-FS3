@@ -55,11 +55,11 @@ const chart01 = () => {
         data: emptyMonthlySales(),
       },
     ],
-    colors: ["#465fff"],
+    colors: ["#7fbd19"],
     chart: {
       fontFamily: "Outfit, sans-serif",
       type: "bar",
-      height: 180,
+      height: 320,
       toolbar: {
         show: false,
       },

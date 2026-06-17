@@ -86,8 +86,8 @@ CREATE TABLE IF NOT EXISTS carrito_producto (
     FOREIGN KEY (producto_id) REFERENCES producto(id)
 );
 
--- 4. Tabla de Bodega (Relacionada con Producto)
-CREATE TABLE IF NOT EXISTS bodega (
+-- 4. Tabla de Stock por Producto
+CREATE TABLE IF NOT EXISTS stock_producto (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     stock INT NOT NULL,
     producto_id BIGINT UNIQUE,
@@ -135,9 +135,10 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 INSERT INTO categoria_producto (categoria) VALUES
 ('Perfumes'),
-('Maquillaje'),
+('Bloqueadores'),
 ('Jabones'),
-('Botellas')
+('Botellas'),
+('Aceites Herbales')
 ON DUPLICATE KEY UPDATE categoria = VALUES(categoria);
 
 -- ============================================================
@@ -151,13 +152,13 @@ INSERT INTO producto (nombre, precio, categoria_producto_id) VALUES
 ('Eau de Toilette Rosa Silvestre', 7800, 1),
 ('Perfume Flores Tropicales', 9500, 1);
 
--- CATEGORIA 2: MAQUILLAJE
+-- CATEGORIA 2: BLOQUEADORES
 INSERT INTO producto (nombre, precio, categoria_producto_id) VALUES
-('Base Maquillante SPF 30', 12000, 2),
-('Mascara de Pestanas Volumen', 8900, 2),
-('Labial Rojo Intenso', 5600, 2),
-('Rubor Natural Peachy', 6800, 2),
-('Sombras de Ojos Set 12 Colores', 15400, 2);
+('Bloqueador Solar Mineral SPF 30', 11900, 2),
+('Bloqueador Solar Facial SPF 50', 13900, 2),
+('Protector Solar Corporal SPF 50', 15400, 2),
+('Bloqueador Infantil Hipoalergenico SPF 50', 16200, 2),
+('Gel Solar Aloe Vera SPF 30', 9800, 2);
 
 -- CATEGORIA 3: JABONES
 INSERT INTO producto (nombre, precio, categoria_producto_id) VALUES
@@ -174,11 +175,18 @@ INSERT INTO producto (nombre, precio, categoria_producto_id) VALUES
 ('Botella Reutilizable Bambu 600ml', 9800, 4),
 ('Botella Deportiva Flip Top 1L', 5600, 4);
 
+-- CATEGORIA 5: ACEITES HERBALES
+INSERT INTO producto (nombre, precio, categoria_producto_id) VALUES
+('Aceite Herbal de Lavanda', 7900, 5),
+('Aceite Herbal de Romero', 7400, 5),
+('Aceite Herbal de Manzanilla', 8200, 5),
+('Aceite Herbal Relajante', 9200, 5);
+
 -- ============================================================
--- 3. CREAR BODEGA (INVENTARIO) PARA TODOS LOS PRODUCTOS
+-- 3. CREAR STOCK PARA TODOS LOS PRODUCTOS
 -- ============================================================
 
-INSERT INTO bodega (stock, producto_id) VALUES
+INSERT INTO stock_producto (stock, producto_id) VALUES
 (50, 1),
 (40, 2),
 (35, 3),
@@ -196,7 +204,11 @@ INSERT INTO bodega (stock, producto_id) VALUES
 (250, 15),
 (40, 16),
 (60, 17),
-(100, 18)
+(100, 18),
+(55, 19),
+(65, 20),
+(45, 21),
+(35, 22)
 ON DUPLICATE KEY UPDATE stock = VALUES(stock);
 
 -- ============================================================

@@ -1,6 +1,7 @@
 import "jsvectormap/dist/jsvectormap.min.css";
 import "flatpickr/dist/flatpickr.min.css";
 import "dropzone/dist/dropzone.css";
+import "lenis/dist/lenis.css";
 import "../css/style.css";
 
 import Alpine from "alpinejs";
@@ -16,8 +17,10 @@ import "./components/calendar-init.js";
 import "./components/image-resize";
 import "./components/metrics-loader";
 import "./components/products-loader";
+import "./components/users-loader";
 import "./components/home-loader";
 import "./components/auth-loader";
+import "./components/smooth-scroll-loader";
 import "./components/products-page-loader";
 import "./components/cart-badge-loader";
 import "./components/cart-page-loader";

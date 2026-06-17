@@ -1,12 +1,6 @@
-import product01 from "../../images/product/product-01.jpg";
-import product02 from "../../images/product/product-02.jpg";
-import product03 from "../../images/product/product-03.jpg";
-import product04 from "../../images/product/product-04.jpg";
-import product05 from "../../images/product/product-05.jpg";
-import { getActiveClientId } from "./auth-loader";
+import { validateSession } from "./auth-loader";
 import { updateCartBadge } from "./cart-badge-loader";
-
-const productImages = [product01, product02, product03, product04, product05];
+import { getProductImage } from "./product-image-resolver";
 
 const formatPrice = (value) =>
   new Intl.NumberFormat("es-CL", {
@@ -60,8 +54,8 @@ const renderCart = (cart) => {
   }
 
   list.innerHTML = products
-    .map((product, index) => {
-      const image = productImages[index % productImages.length];
+    .map((product) => {
+      const image = getProductImage(product);
       const category = product.categoria?.categoria || "Producto";
 
       return `
@@ -83,7 +77,9 @@ const loadCartPage = async () => {
   const list = document.getElementById("cart-items");
   if (!list) return;
 
-  const clientId = getActiveClientId();
+  const session = await validateSession();
+  const clientId = session?.cliente?.id;
+
   if (!clientId) {
     list.innerHTML = `
       <div class="cart-empty">
@@ -123,7 +119,9 @@ const setupCartActions = () => {
     button.disabled = true;
 
     try {
-      const clientId = getActiveClientId();
+      const session = await validateSession();
+      const clientId = session?.cliente?.id;
+
       if (!clientId) {
         window.location.href = "login.html";
         return;
