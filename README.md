@@ -22,22 +22,21 @@ git clone https://github.com/Dariodelagb/Proyecto-Ecomarket-FS3.git
 cd Proyecto-Ecomarket-FS3
 
 ### 2. Levantar los contenedores
-Antes de levantar los contenedores, ejecuta **npm install** en la raiz del frontend_node
 
-Abre Docker Desktop
+Abre Docker Desktop o systemctl start docker
 
 Para iniciar el proyecto, ejecuta el siguiente comando:
 
 docker-compose up --build
 
-Nota: Esto tarda bastante.
+Nota: Esto inicia en secuencia: Mysql -> servicio DB -> npm install -> Frontend -> Reportes. Tarda bastante.
 
 ### 3. Acceso al sistema
 Una vez que veas en la consola que todos los contenedores están corriendo:
 
-Base de Datos: Accesible en el puerto 3306.
+Base de Datos: Mysql accesible en el puerto 3306 y Endpoints accesibles en el puerto 8080
 
-Aplicación: Accesible en http://localhost:8081.
+Aplicación: Accesible en http://localhost:8083/.
 
 ### Persistencia de datos
 
