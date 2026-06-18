@@ -7,5 +7,5 @@ public class ProductoDTO {
     private Long id;
     private String nombre;
     private Integer precio;
-    private String categoriaNombre; // Para simplificar, solo el nombre de la categoria
+    private CategoriaDTO categoria;
 }

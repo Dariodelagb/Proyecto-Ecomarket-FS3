@@ -1,0 +1,476 @@
+{
+  "info": {
+    "_postman_id": "6ddc55a8-f5b4-4fd2-bd0c-ecomarketfs3",
+    "name": "Ecomarket FS3",
+    "description": "Coleccion de endpoints para el backend principal y el microservicio de reportes de Ecomarket.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "db_base_url",
+      "value": "http://localhost:8080/api"
+    },
+    {
+      "key": "reportes_base_url",
+      "value": "http://localhost:8082"
+    },
+    {
+      "key": "cliente_id",
+      "value": "1"
+    },
+    {
+      "key": "producto_id",
+      "value": "1"
+    },
+    {
+      "key": "categoria_id",
+      "value": "1"
+    },
+    {
+      "key": "stock_id",
+      "value": "1"
+    },
+    {
+      "key": "direccion_id",
+      "value": "1"
+    },
+    {
+      "key": "venta_id",
+      "value": "1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Autenticacion",
+      "item": [
+        {
+          "name": "Registrar cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Juan\",\n  \"apellidos\": \"Perez\",\n  \"rut\": 12345678,\n  \"dvrut\": \"9\",\n  \"email\": \"juan.perez@example.com\",\n  \"contrasena\": \"clave123\",\n  \"direcciones\": [\n    {\n      \"calle\": \"Av. Siempre Viva\",\n      \"numero\": \"742\",\n      \"comuna\": \"Santiago\",\n      \"ciudad\": \"Santiago\",\n      \"region\": \"Metropolitana\",\n      \"referencia\": \"Casa azul\",\n      \"principal\": true\n    }\n  ]\n}"
+            },
+            "url": "{{db_base_url}}/auth/registro",
+            "description": "Crea un cliente y devuelve un token de sesion. Si el primer nombre es admin, el rol queda como ADMIN."
+          }
+        },
+        {
+          "name": "Iniciar sesion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@example.com\",\n  \"rut\": \"12345678\",\n  \"dvrut\": \"9\",\n  \"contrasena\": \"clave123\"\n}"
+            },
+            "url": "{{db_base_url}}/auth/login"
+          }
+        },
+        {
+          "name": "Ver sesion por token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{db_base_url}}/auth/sesion/{{token}}"
+          }
+        },
+        {
+          "name": "Cerrar sesion",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{db_base_url}}/auth/sesion/{{token}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "Listar clientes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{db_base_url}}/clientes"
+          }
+        },
+        {
+          "name": "Contar clientes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{db_base_url}}/clientes/count"
+          }
+        },
+        {
+          "name": "Crear cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Maria\",\n  \"apellidos\": \"Gonzalez\",\n  \"rut\": 11222333,\n  \"dvrut\": \"4\",\n  \"email\": \"maria.gonzalez@example.com\",\n  \"contrasena\": \"clave123\",\n  \"direcciones\": []\n}"
+            },
+            "url": "{{db_base_url}}/clientes"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Direcciones",
+      "item": [
+        {
+          "name": "Listar direcciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{db_base_url}}/direcciones"
+          }
+        },
+        {
+          "name": "Listar direcciones por cliente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{db_base_url}}/clientes/{{cliente_id}}/direcciones"
+          }
+        },
+        {
+          "name": "Crear direccion para cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"calle\": \"Los Olivos\",\n  \"numero\": \"1234\",\n  \"comuna\": \"Providencia\",\n  \"ciudad\": \"Santiago\",\n  \"region\": \"Metropolitana\",\n  \"referencia\": \"Depto 402\",\n  \"principal\": false\n}"
+            },
+            "url": "{{db_base_url}}/clientes/{{cliente_id}}/direcciones"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Contactos",
+      "item": [
+        {
+          "name": "Listar contactos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{db_base_url}}/contactos"
+          }
+        },
+        {
+          "name": "Crear contacto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Cliente Demo\",\n  \"correo\": \"cliente.demo@example.com\",\n  \"mensaje\": \"Hola, quiero mas informacion sobre los productos.\"\n}"
+            },
+            "url": "{{db_base_url}}/contactos"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Carritos",
+      "item": [
+        {
+          "name": "Listar carritos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{db_base_url}}/carritos"
+          }
+        },
+        {
+          "name": "Ver carrito por cliente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{db_base_url}}/carritos/cliente/{{cliente_id}}"
+          }
+        },
+        {
+          "name": "Agregar producto al carrito",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{db_base_url}}/carritos/cliente/{{cliente_id}}/productos/{{producto_id}}"
+          }
+        },
+        {
+          "name": "Quitar producto del carrito",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{db_base_url}}/carritos/cliente/{{cliente_id}}/productos/{{producto_id}}"
+          }
+        },
+        {
+          "name": "Vaciar carrito",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{db_base_url}}/carritos/cliente/{{cliente_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Productos",
+      "item": [
+        {
+          "name": "Listar productos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{db_base_url}}/productos"
+          }
+        },
+        {
+          "name": "Crear producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Bloqueador solar natural SPF 50\",\n  \"precio\": 12990,\n  \"categoria\": {\n    \"id\": {{categoria_id}}\n  }\n}"
+            },
+            "url": "{{db_base_url}}/productos"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stock Producto",
+      "item": [
+        {
+          "name": "Listar stock producto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{db_base_url}}/stock-producto"
+          }
+        },
+        {
+          "name": "Listar stock producto alias bodega",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{db_base_url}}/bodega"
+          }
+        },
+        {
+          "name": "Crear stock producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stock\": 25,\n  \"producto\": {\n    \"id\": {{producto_id}}\n  }\n}"
+            },
+            "url": "{{db_base_url}}/stock-producto"
+          }
+        },
+        {
+          "name": "Actualizar stock producto",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stock\": 40\n}"
+            },
+            "url": "{{db_base_url}}/stock-producto/{{stock_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ventas",
+      "item": [
+        {
+          "name": "Crear venta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoEnvio\": \"Despacho a domicilio\",\n  \"monto\": 25980,\n  \"cliente\": {\n    \"id\": {{cliente_id}}\n  },\n  \"direccion\": {\n    \"id\": {{direccion_id}}\n  },\n  \"detalles\": [\n    {\n      \"cantidad\": 2,\n      \"precioUnitario\": 12990,\n      \"fecha\": \"2026-06-18\",\n      \"producto\": {\n        \"id\": {{producto_id}}\n      }\n    }\n  ]\n}"
+            },
+            "url": "{{db_base_url}}/ventas"
+          }
+        },
+        {
+          "name": "Listar ventas completas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{db_base_url}}/ventas-completas"
+          }
+        },
+        {
+          "name": "Historial de ventas por cliente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{db_base_url}}/clientes/{{cliente_id}}/ventas"
+          }
+        },
+        {
+          "name": "Contar ventas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{db_base_url}}/ventas/count"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Boletas",
+      "item": [
+        {
+          "name": "Crear boleta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monto\": 25980,\n  \"venta\": {\n    \"id\": {{venta_id}}\n  }\n}"
+            },
+            "url": "{{db_base_url}}/boletas"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categorias",
+      "item": [
+        {
+          "name": "Listar categorias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{db_base_url}}/categorias"
+          }
+        },
+        {
+          "name": "Crear categoria",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoria\": \"Bloqueadores\"\n}"
+            },
+            "url": "{{db_base_url}}/categorias"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reportes",
+      "item": [
+        {
+          "name": "Generar reporte en consola",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{reportes_base_url}}/api/reportes/generar"
+          }
+        },
+        {
+          "name": "Resumen dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{reportes_base_url}}/api/reportes/resumen"
+          }
+        },
+        {
+          "name": "Descargar reporte Excel",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{reportes_base_url}}/get-reporte",
+            "description": "Descarga reporte-dashboard.xlsx con resumen, ventas, usuarios sin datos sensibles, productos/stock y ventas mensuales."
+          }
+        },
+        {
+          "name": "Descargar reporte Excel alias API",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{reportes_base_url}}/api/reportes/get-reporte"
+          }
+        }
+      ]
+    }
+  ]
+}

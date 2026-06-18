@@ -5,6 +5,15 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+/// <summary>
+/// Componente de inicialización de datos para la base de datos de Ecomarket.
+/// Este componente se ejecuta al iniciar la aplicación y se encarga de:
+/// 1. Migrar el esquema de la tabla "cliente" para agregar campos de autentic
+///   ación (email, contrasena, rol).
+/// 2. Crear tablas necesarias para el funcionamiento de la base de datos.
+/// 3. Sembrar datos iniciales en tablas como "categoria_producto", "direccion" y actualizar registros existentes.
+/// </summary>
+
 @Component
 public class DataInitializer implements ApplicationRunner {
 
