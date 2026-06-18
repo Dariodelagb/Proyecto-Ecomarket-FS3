@@ -213,6 +213,41 @@ URL: http://localhost:8082/get-reporte
 
 Descarga un archivo Excel con resumen del dashboard, ventas, usuarios sin datos sensibles, productos con stock y ventas mensuales.
 
+### Descargar resultados de pruebas
+
+Metodo: GET  
+URL: http://localhost:8082/get-pruebas
+
+Descarga un archivo de texto con comprobaciones del servicio de reportes, consultas principales al backend, resumen del dashboard y generacion del Excel.
+
+Este archivo valida:
+
+- Conexion TCP con MySQL dentro de Docker.
+- Respuesta de la API REST del backend en el puerto 8080.
+- Consultas principales de clientes, productos, stock y ventas.
+- Generacion del Excel de reportes.
+- Cobertura de codigo generada con JaCoCo al ejecutar las pruebas unitarias.
+
+Para ejecutar las pruebas del servicio de reportes desde consola:
+
+```bash
+cd sistemareportes
+./mvnw test
+```
+
+En Windows PowerShell:
+
+```powershell
+cd sistemareportes
+.\mvnw.cmd test
+```
+
+El reporte de cobertura queda generado en:
+
+```text
+sistemareportes/target/site/jacoco/index.html
+```
+
 ### Persistencia de datos
 
 Si deseas reiniciar la base de datos desde cero (limpiar todos los datos):

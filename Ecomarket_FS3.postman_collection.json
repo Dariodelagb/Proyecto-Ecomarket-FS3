@@ -463,11 +463,28 @@
           }
         },
         {
+          "name": "Descargar resultados de pruebas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{reportes_base_url}}/get-pruebas",
+            "description": "Descarga resultado-pruebas.txt con comprobaciones de MySQL, API REST 8080, servicio de reportes, endpoints principales y cobertura JaCoCo."
+          }
+        },
+        {
           "name": "Descargar reporte Excel alias API",
           "request": {
             "method": "GET",
             "header": [],
             "url": "{{reportes_base_url}}/api/reportes/get-reporte"
+          }
+        },
+        {
+          "name": "Descargar resultados de pruebas alias API",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{reportes_base_url}}/api/reportes/get-pruebas"
           }
         }
       ]
