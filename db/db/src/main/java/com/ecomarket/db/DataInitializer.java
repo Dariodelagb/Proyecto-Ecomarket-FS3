@@ -184,10 +184,26 @@ public class DataInitializer implements ApplicationRunner {
             CREATE TABLE IF NOT EXISTS carrito_producto (
                 carrito_id BIGINT NOT NULL,
                 producto_id BIGINT NOT NULL,
+                cantidad INT NOT NULL DEFAULT 1,
                 PRIMARY KEY (carrito_id, producto_id)
             )
             """
         );
+
+        Integer cantidadColumnCount = jdbcTemplate.queryForObject(
+            """
+            SELECT COUNT(*)
+            FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = DATABASE()
+              AND TABLE_NAME = 'carrito_producto'
+              AND COLUMN_NAME = 'cantidad'
+            """,
+            Integer.class
+        );
+
+        if (cantidadColumnCount != null && cantidadColumnCount == 0) {
+            jdbcTemplate.execute("ALTER TABLE carrito_producto ADD COLUMN cantidad INT NOT NULL DEFAULT 1");
+        }
     }
 
     private void migrateStockProductoSchema() {

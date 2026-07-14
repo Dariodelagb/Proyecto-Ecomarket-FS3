@@ -17,11 +17,20 @@ public class Carrito {
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
-    @ManyToMany
-    @JoinTable(
-        name = "carrito_producto",
-        joinColumns = @JoinColumn(name = "carrito_id"),
-        inverseJoinColumns = @JoinColumn(name = "producto_id")
-    )
-    private List<Producto> productos = new ArrayList<>();
+    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CarritoProducto> items = new ArrayList<>();
+
+    @Transient
+    public List<Producto> getProductos() {
+        List<Producto> productos = new ArrayList<>();
+
+        for (CarritoProducto item : items) {
+            int cantidad = item.getCantidad() == null ? 1 : item.getCantidad();
+            for (int i = 0; i < cantidad; i++) {
+                productos.add(item.getProducto());
+            }
+        }
+
+        return productos;
+    }
 }

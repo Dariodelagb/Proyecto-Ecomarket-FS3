@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecomarket.db.model.Boleta;
 import com.ecomarket.db.model.Carrito;
+import com.ecomarket.db.model.CarritoProducto;
+import com.ecomarket.db.model.CarritoProductoId;
 import com.ecomarket.db.model.CategoriaProducto;
 import com.ecomarket.db.model.Cliente;
 import com.ecomarket.db.model.Contacto;
@@ -175,15 +177,37 @@ public class SistemaVentasController {
 
     @PostMapping("/carritos/cliente/{clienteId}/productos/{productoId}")
     @Transactional
-    public Carrito agregarProductoAlCarrito(@PathVariable Long clienteId, @PathVariable Long productoId) {
+    public Carrito agregarProductoAlCarrito(
+        @PathVariable Long clienteId,
+        @PathVariable Long productoId,
+        @RequestBody(required = false) Map<String, Integer> body
+    ) {
         Carrito carrito = obtenerOCrearCarrito(clienteId);
         Producto producto = productoRepo.findById(productoId).orElseThrow();
+        int cantidad = body != null && body.get("cantidad") != null ? body.get("cantidad") : 1;
 
-        boolean yaExiste = carrito.getProductos().stream()
-            .anyMatch(item -> item.getId().equals(productoId));
+        if (cantidad < 1) {
+            throw new RuntimeException("La cantidad debe ser mayor a 0");
+        }
 
-        if (!yaExiste) {
-            carrito.getProductos().add(producto);
+        CarritoProducto item = carrito.getItems().stream()
+            .filter(actual -> actual.getProducto() != null && actual.getProducto().getId().equals(productoId))
+            .findFirst()
+            .orElse(null);
+
+        if (item == null) {
+            item = new CarritoProducto();
+            CarritoProductoId itemId = new CarritoProductoId();
+            itemId.setCarritoId(carrito.getId());
+            itemId.setProductoId(productoId);
+            item.setId(itemId);
+            item.setCarrito(carrito);
+            item.setProducto(producto);
+            item.setCantidad(cantidad);
+            carrito.getItems().add(item);
+        } else {
+            int cantidadActual = item.getCantidad() == null ? 0 : item.getCantidad();
+            item.setCantidad(cantidadActual + cantidad);
         }
 
         return carritoRepo.save(carrito);
@@ -193,7 +217,7 @@ public class SistemaVentasController {
     @Transactional
     public Carrito quitarProductoDelCarrito(@PathVariable Long clienteId, @PathVariable Long productoId) {
         Carrito carrito = obtenerOCrearCarrito(clienteId);
-        carrito.getProductos().removeIf(producto -> producto.getId().equals(productoId));
+        carrito.getItems().removeIf(item -> item.getProducto() != null && item.getProducto().getId().equals(productoId));
         return carritoRepo.save(carrito);
     }
 
@@ -201,7 +225,7 @@ public class SistemaVentasController {
     @Transactional
     public Map<String, Boolean> vaciarCarrito(@PathVariable Long clienteId) {
         Carrito carrito = obtenerOCrearCarrito(clienteId);
-        carrito.getProductos().clear();
+        carrito.getItems().clear();
         carritoRepo.save(carrito);
         return Map.of("ok", true);
     }

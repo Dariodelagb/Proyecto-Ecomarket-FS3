@@ -20,8 +20,25 @@ const escapeHtml = (value) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 
-const getCartTotal = (products) =>
-  products.reduce((total, product) => total + (product.precio || 0), 0);
+const getCartItems = (cart) => {
+  if (cart?.items?.length) {
+    return cart.items.map((item) => ({
+      producto: item.producto,
+      cantidad: item.cantidad || 1,
+    }));
+  }
+
+  return (cart?.productos || []).map((product) => ({
+    producto: product,
+    cantidad: 1,
+  }));
+};
+
+const getCartTotal = (items) =>
+  items.reduce((total, item) => total + ((item.producto?.precio || 0) * item.cantidad), 0);
+
+const getCartCount = (items) =>
+  items.reduce((total, item) => total + item.cantidad, 0);
 
 const enforceDigits = (input, maxLength) => {
   if (!input) return;
@@ -85,25 +102,29 @@ const renderSummary = () => {
   const list = document.getElementById("checkout-items");
   const total = document.getElementById("checkout-total");
   const count = document.getElementById("checkout-count");
-  const products = currentCart?.productos || [];
+  const items = getCartItems(currentCart);
+  const itemCount = getCartCount(items);
 
-  if (total) total.textContent = formatPrice(getCartTotal(products));
+  if (total) total.textContent = formatPrice(getCartTotal(items));
   if (count) {
-    count.textContent = `${products.length} ${products.length === 1 ? "producto" : "productos"}`;
+    count.textContent = `${itemCount} ${itemCount === 1 ? "producto" : "productos"}`;
   }
 
   if (!list) return;
 
-  list.innerHTML = products
-    .map((product) => {
+  list.innerHTML = items
+    .map((item) => {
+      const product = item.producto;
       const image = getProductImage(product);
+      const subtotal = (product.precio || 0) * item.cantidad;
 
       return `
         <article class="checkout-item">
           <img src="${image}" alt="${escapeHtml(product.nombre)}" />
           <div>
             <h3>${escapeHtml(product.nombre)}</h3>
-            <p>${formatPrice(product.precio)}</p>
+            <p>${formatPrice(product.precio)} x ${item.cantidad}</p>
+            <strong>${formatPrice(subtotal)}</strong>
           </div>
         </article>
       `;
@@ -195,7 +216,7 @@ const loadCheckout = async () => {
     currentCart = await cartResponse.json();
     currentDirections = await directionsResponse.json();
 
-    if (!currentCart.productos?.length) {
+    if (!getCartItems(currentCart).length) {
       showCheckoutMessage(
         "Tu carrito esta vacio",
         "Agrega productos antes de finalizar la compra.",
@@ -261,7 +282,7 @@ const setupAddressToggle = () => {
 const createSale = async (form) => {
   const session = await validateSession();
   const clientId = session?.cliente?.id;
-  const products = currentCart?.productos || [];
+  const items = getCartItems(currentCart);
 
   if (!clientId) {
     throw new Error("Debes iniciar sesion para completar la compra");
@@ -271,13 +292,13 @@ const createSale = async (form) => {
 
   const payload = {
     tipoEnvio: "Envio a domicilio",
-    monto: getCartTotal(products),
+    monto: getCartTotal(items),
     cliente: { id: clientId },
     direccion: { id: direccion.id },
-    detalles: products.map((product) => ({
-      cantidad: 1,
-      precioUnitario: product.precio || 0,
-      producto: { id: product.id },
+    detalles: items.map((item) => ({
+      cantidad: item.cantidad,
+      precioUnitario: item.producto?.precio || 0,
+      producto: { id: item.producto?.id },
     })),
   };
 

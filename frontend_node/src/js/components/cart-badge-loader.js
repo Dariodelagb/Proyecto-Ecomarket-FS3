@@ -17,7 +17,8 @@ const updateCartBadge = async () => {
     if (!response.ok) throw new Error("No se pudo cargar el carrito");
 
     const cart = await response.json();
-    badge.textContent = cart.productos?.length || 0;
+    const itemCount = cart.items?.reduce((total, item) => total + (item.cantidad || 1), 0);
+    badge.textContent = itemCount ?? cart.productos?.length ?? 0;
   } catch (error) {
     console.error("Error cargando contador del carrito:", error);
     badge.textContent = "0";

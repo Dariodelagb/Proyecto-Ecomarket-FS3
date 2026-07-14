@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS carrito (
 CREATE TABLE IF NOT EXISTS carrito_producto (
     carrito_id BIGINT NOT NULL,
     producto_id BIGINT NOT NULL,
+    cantidad INT NOT NULL DEFAULT 1,
     PRIMARY KEY (carrito_id, producto_id),
     FOREIGN KEY (carrito_id) REFERENCES carrito(id),
     FOREIGN KEY (producto_id) REFERENCES producto(id)

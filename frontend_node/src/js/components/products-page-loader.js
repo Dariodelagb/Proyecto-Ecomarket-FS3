@@ -41,6 +41,7 @@ const groupProductsByCategory = (products) =>
 const renderProductCard = (product) => {
   const category = getCategoryName(product);
   const image = getProductImage(product);
+  const productId = product.id || "";
 
   return `
     <article class="home-product-card products-page-card">
@@ -49,10 +50,24 @@ const renderProductCard = (product) => {
         <span>${escapeHtml(category)}</span>
         <h3>${escapeHtml(product.nombre)}</h3>
         <p>${formatPrice(product.precio)}</p>
+        <div class="product-quantity-control" data-quantity-product-id="${productId}">
+          <button type="button" data-quantity-action="decrease" ${product.id ? "" : "disabled"}>-</button>
+          <input
+            type="number"
+            value="1"
+            min="1"
+            max="99"
+            inputmode="numeric"
+            aria-label="Cantidad de ${escapeHtml(product.nombre)}"
+            data-quantity-input
+            ${product.id ? "" : "disabled"}
+          />
+          <button type="button" data-quantity-action="increase" ${product.id ? "" : "disabled"}>+</button>
+        </div>
         <button
           type="button"
           class="product-add-button"
-          data-product-id="${product.id || ""}"
+          data-product-id="${productId}"
           ${product.id ? "" : "disabled"}
         >
           Agregar al carrito
@@ -115,6 +130,22 @@ const setupAddToCart = () => {
   if (!grid) return;
 
   grid.addEventListener("click", async (event) => {
+    const quantityButton = event.target.closest("[data-quantity-action]");
+    if (quantityButton) {
+      const control = quantityButton.closest(".product-quantity-control");
+      const input = control?.querySelector("[data-quantity-input]");
+      if (!input) return;
+
+      const currentValue = Number(input.value) || 1;
+      const nextValue =
+        quantityButton.dataset.quantityAction === "increase"
+          ? currentValue + 1
+          : currentValue - 1;
+
+      input.value = String(Math.min(99, Math.max(1, nextValue)));
+      return;
+    }
+
     const button = event.target.closest("[data-product-id]");
     if (!button || !button.dataset.productId) return;
 
@@ -129,16 +160,24 @@ const setupAddToCart = () => {
     const previousText = button.textContent;
     button.disabled = true;
     button.textContent = "Agregando...";
+    const card = button.closest(".products-page-card");
+    const quantityInput = card?.querySelector("[data-quantity-input]");
+    const quantity = Math.min(99, Math.max(1, Number(quantityInput?.value) || 1));
 
     try {
       const response = await fetch(
         `/api/carritos/cliente/${clientId}/productos/${button.dataset.productId}`,
-        { method: "POST" },
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cantidad: quantity }),
+        },
       );
 
       if (!response.ok) throw new Error("No se pudo agregar el producto");
 
-      button.textContent = "Agregado";
+      button.textContent = quantity === 1 ? "Agregado" : `${quantity} agregados`;
+      if (quantityInput) quantityInput.value = "1";
       await updateCartBadge();
     } catch (error) {
       console.error("Error agregando producto al carrito:", error);
@@ -154,6 +193,14 @@ const setupAddToCart = () => {
       button.textContent = previousText;
       button.disabled = false;
     }, 1200);
+  });
+
+  grid.addEventListener("input", (event) => {
+    const input = event.target.closest("[data-quantity-input]");
+    if (!input) return;
+
+    const value = Number(input.value) || 1;
+    input.value = String(Math.min(99, Math.max(1, value)));
   });
 };
 

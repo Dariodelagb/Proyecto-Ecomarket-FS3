@@ -99,4 +99,9 @@ document.addEventListener("DOMContentLoaded", () => {
   loadProductsTable();
 });
 
+window.addEventListener("ecomarket:products-updated", () => {
+  loadProductsTable();
+});
+
+export { loadProductsTable };
 export default { loadProductsTable };

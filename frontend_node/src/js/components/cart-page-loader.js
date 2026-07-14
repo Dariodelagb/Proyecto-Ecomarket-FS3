@@ -17,8 +17,25 @@ const escapeHtml = (value) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 
-const getCartTotal = (products) =>
-  products.reduce((total, product) => total + (product.precio || 0), 0);
+const getCartItems = (cart) => {
+  if (cart.items?.length) {
+    return cart.items.map((item) => ({
+      producto: item.producto,
+      cantidad: item.cantidad || 1,
+    }));
+  }
+
+  return (cart.productos || []).map((product) => ({
+    producto: product,
+    cantidad: 1,
+  }));
+};
+
+const getCartTotal = (items) =>
+  items.reduce((total, item) => total + ((item.producto?.precio || 0) * item.cantidad), 0);
+
+const getCartCount = (items) =>
+  items.reduce((total, item) => total + item.cantidad, 0);
 
 const renderCart = (cart) => {
   const list = document.getElementById("cart-items");
@@ -28,7 +45,7 @@ const renderCart = (cart) => {
 
   if (!list) return;
 
-  const products = cart.productos || [];
+  const items = getCartItems(cart);
   const cliente = cart.cliente;
 
   if (clientName) {
@@ -37,12 +54,14 @@ const renderCart = (cart) => {
       : "Cliente invitado";
   }
 
-  if (total) total.textContent = formatPrice(getCartTotal(products));
+  const itemCount = getCartCount(items);
+
+  if (total) total.textContent = formatPrice(getCartTotal(items));
   if (summaryCount) {
-    summaryCount.textContent = `${products.length} ${products.length === 1 ? "producto" : "productos"}`;
+    summaryCount.textContent = `${itemCount} ${itemCount === 1 ? "producto" : "productos"}`;
   }
 
-  if (!products.length) {
+  if (!items.length) {
     list.innerHTML = `
       <div class="cart-empty">
         <h3>Tu carrito esta vacio</h3>
@@ -53,10 +72,12 @@ const renderCart = (cart) => {
     return;
   }
 
-  list.innerHTML = products
-    .map((product) => {
+  list.innerHTML = items
+    .map((item) => {
+      const product = item.producto;
       const image = getProductImage(product);
       const category = product.categoria?.categoria || "Producto";
+      const subtotal = (product.precio || 0) * item.cantidad;
 
       return `
         <article class="cart-item">
@@ -64,7 +85,8 @@ const renderCart = (cart) => {
           <div>
             <span>${escapeHtml(category)}</span>
             <h3>${escapeHtml(product.nombre)}</h3>
-            <p>${formatPrice(product.precio)}</p>
+            <p>${formatPrice(product.precio)} x ${item.cantidad}</p>
+            <strong>${formatPrice(subtotal)}</strong>
           </div>
           <button type="button" data-remove-product-id="${product.id}">Quitar</button>
         </article>
