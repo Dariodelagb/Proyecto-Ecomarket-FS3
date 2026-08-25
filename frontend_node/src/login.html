@@ -48,7 +48,38 @@
           <p class="home-form__status" id="login-status" aria-live="polite"></p>
           <button type="submit">Iniciar sesion</button>
         </form>
+
+        <!-- MSAL buttons -->
+        <div style="margin-top:1rem">
+          <button id="msal-signin" type="button">Iniciar sesión con Microsoft</button>
+          <button id="msal-signout" type="button">Cerrar sesión</button>
+        </div>
+
       </section>
     </main>
+
+    <!-- MSAL scripts -->
+    <script src="https://alcdn.msauth.net/browser/2.36.0/js/msal-browser.min.js"></script>
+    <script src="js/msal-config.js"></script>
+    <script>
+      document.getElementById("msal-signin").addEventListener("click", async () => {
+        try {
+          await signIn();
+          window.location.href = "profile.html";
+        } catch (e) {
+          console.error("Login error", e);
+          alert("Error al iniciar sesión: " + e.message);
+        }
+      });
+      document.getElementById("msal-signout").addEventListener("click", () => {
+        signOut();
+      });
+
+      // Optional: prevent default form submit since we delegate to MSAL
+      document.getElementById('login-form').addEventListener('submit', function(e){
+        e.preventDefault();
+        alert('Use "Iniciar sesión con Microsoft" para autenticarse.');
+      });
+    </script>
   </body>
 </html>

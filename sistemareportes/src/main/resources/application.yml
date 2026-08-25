@@ -1,0 +1,7 @@
+# sistemareportes application config
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://login.microsoftonline.com/d00e23b8-6f53-4f67-8a7b-b1f47ab3a272/v2.0
