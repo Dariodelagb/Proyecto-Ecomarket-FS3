@@ -58,27 +58,36 @@
       </section>
     </main>
 
-    <!-- MSAL scripts -->
-    <script src="https://alcdn.msauth.net/browser/2.36.0/js/msal-browser.min.js"></script>
-    <script src="js/msal-config.js"></script>
+    <!-- MSAL scripts: usar un CDN fiable -->
+    <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.36.0/dist/msal-browser.min.js"></script>
+    <script src="./js/msal-config.js"></script>
     <script>
-      document.getElementById("msal-signin").addEventListener("click", async () => {
+      document.getElementById('msal-signin').addEventListener('click', async () => {
+        if (typeof window.signIn !== 'function') {
+          alert('MSAL no está listo. Recarga la página e intenta de nuevo.');
+          return;
+        }
         try {
-          await signIn();
-          window.location.href = "profile.html";
+          await window.signIn();
+          window.location.href = 'profile.html';
         } catch (e) {
-          console.error("Login error", e);
-          alert("Error al iniciar sesión: " + e.message);
+          console.error('Login error', e);
+          alert('Error al iniciar sesión: ' + (e && e.message ? e.message : e));
         }
       });
-      document.getElementById("msal-signout").addEventListener("click", () => {
-        signOut();
+
+      document.getElementById('msal-signout').addEventListener('click', () => {
+        if (typeof window.signOut === 'function') {
+          window.signOut();
+        } else {
+          alert('MSAL no está listo. Recarga la página e intenta de nuevo.');
+        }
       });
 
-      // Optional: prevent default form submit since we delegate to MSAL
+      // Prevent default form submit to encourage MSAL flow
       document.getElementById('login-form').addEventListener('submit', function(e){
         e.preventDefault();
-        alert('Use "Iniciar sesión con Microsoft" para autenticarse.');
+        alert('Usa "Iniciar sesión con Microsoft" para autenticar.');
       });
     </script>
   </body>
