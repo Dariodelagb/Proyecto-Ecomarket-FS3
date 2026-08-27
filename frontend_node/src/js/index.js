@@ -28,6 +28,8 @@ import "./components/cart-badge-loader";
 import "./components/cart-page-loader";
 import "./components/checkout-loader";
 
+import { signIn, signOut } from "./msal-config";
+
 Alpine.plugin(persist);
 window.Alpine = Alpine;
 Alpine.start();
@@ -40,9 +42,9 @@ flatpickr(".datepicker", {
   dateFormat: "M j",
   defaultDate: [new Date().setDate(new Date().getDate() - 6), new Date()],
   prevArrow:
-    '<svg class="stroke-current" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.25 6L9 12.25L15.25 18.5" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    '<svg class="stroke-current" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.25 6L9 12.25L15.25 18.5" stroke="" stroke-width="1.5" stroke[...]>',
   nextArrow:
-    '<svg class="stroke-current" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.75 19L15 12.75L8.75 6.5" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    '<svg class="stroke-current" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.75 19L15 12.75L8.75 6.5" stroke="" stroke-width="1.5" stroke-[...]>',
   onReady: (selectedDates, dateStr, instance) => {
     // eslint-disable-next-line no-param-reassign
     instance.element.value = dateStr.replace("to", "-");
@@ -130,4 +132,28 @@ document.addEventListener("DOMContentLoaded", function () {
       focusSearchInput();
     }
   });
+});
+
+// Attach MSAL handlers to DOM buttons (if present)
+document.addEventListener("DOMContentLoaded", () => {
+  const msalSignInBtn = document.getElementById("msal-signin");
+  const msalSignOutBtn = document.getElementById("msal-signout");
+
+  if (msalSignInBtn) {
+    msalSignInBtn.addEventListener("click", async () => {
+      try {
+        await signIn();
+        window.location.href = "profile.html";
+      } catch (e) {
+        console.error("Login error", e);
+        alert("Error al iniciar sesión: " + (e && e.message ? e.message : e));
+      }
+    });
+  }
+
+  if (msalSignOutBtn) {
+    msalSignOutBtn.addEventListener("click", () => {
+      signOut();
+    });
+  }
 });
