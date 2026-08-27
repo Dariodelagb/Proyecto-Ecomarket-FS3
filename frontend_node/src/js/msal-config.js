@@ -16,7 +16,7 @@ const loginRequest = {
   scopes: [
     "openid",
     "profile",
-    "api://64533da2-6952-4e6c-8afa-c4eafddd0060/access_as_user",
+    "api://64533da2-6952-4e6c-8afa-c4eafddd0060/Access-as-user",
   ],
 };
 
