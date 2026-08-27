@@ -1,0 +1,18 @@
+# DB service application properties - lightweight defaults for local testing
+spring:
+  datasource:
+    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+# Resource server: configure issuer-uri in your environment for production
+# For local tests you can disable by setting spring.security.oauth2.resourceserver.jwt.jwk-set-uri
+# spring.security.oauth2.resourceserver.jwt.issuer-uri: https://login.microsoftonline.com/<tenant>/v2.0
+
+server:
+  port: 9090
