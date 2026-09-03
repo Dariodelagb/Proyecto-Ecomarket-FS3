@@ -34,8 +34,11 @@
       <div class="home-auth-actions">
         <a class="home-auth-link auth-guest-only" href="registro.html">Registrarse</a>
         <a class="home-auth-link auth-guest-only" href="login.html">Iniciar sesion</a>
-        <a class="home-auth-link auth-admin-only" href="dashboard.html" hidden>Dashboard</a>
-        <button class="home-auth-link auth-session-only" type="button" data-logout>Cerrar sesion</button>
+        <a class="home-auth-link auth-admin-only" href="dashboard.html">Dashboard</a>
+        <a class="home-auth-link auth-session-only" href="profile.html" hidden>
+          <span id="user-name">Usuario</span>
+        </a>
+        <button class="home-auth-link auth-session-only" type="button" data-logout hidden>Cerrar sesion</button>
       </div>
       <a class="home-cart-link" href="carrito.html" aria-label="Ver carrito">
         <svg viewBox="0 0 24 24" aria-hidden="true">

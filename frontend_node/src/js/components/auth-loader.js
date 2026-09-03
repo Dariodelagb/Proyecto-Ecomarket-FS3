@@ -37,6 +37,13 @@ const setupInputConstraints = () => {
 const updateAuthControls = () => {
   const hasSession = Boolean(getSession()?.token);
   const hasAdminSession = hasSession && isAdminSession();
+  const session = getSession();
+
+  // Mostrar nombre del usuario si está logueado
+  const userNameElement = document.getElementById("user-name");
+  if (userNameElement && session?.cliente?.nombres) {
+    userNameElement.textContent = session.cliente.nombres;
+  }
 
   document.querySelectorAll(".auth-guest-only").forEach((element) => {
     element.hidden = hasSession;
@@ -175,7 +182,8 @@ const setupRegisterForm = () => {
 
       const session = await response.json();
       setSession(session);
-      window.location.href = "index.html";
+      const redirectUrl = isAdminSession() ? "dashboard.html" : "index.html";
+      window.location.href = redirectUrl;
     } catch (error) {
       console.error("Error registrando usuario:", error);
       if (status) status.textContent = error.message || "No se pudo registrar. Revisa los datos.";
@@ -218,7 +226,8 @@ const setupLoginForm = () => {
 
       const session = await response.json();
       setSession(session);
-      window.location.href = "index.html";
+      const redirectUrl = isAdminSession() ? "dashboard.html" : "index.html";
+      window.location.href = redirectUrl;
     } catch (error) {
       console.error("Error iniciando sesion:", error);
       if (status) status.textContent = error.message || "Datos incorrectos. Intenta nuevamente.";
