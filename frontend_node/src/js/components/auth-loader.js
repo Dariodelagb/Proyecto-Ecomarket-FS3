@@ -1,4 +1,5 @@
 const SESSION_KEY = "ecomarketSession";
+const MSAL_SESSION_KEY = "msalSession";
 
 const getSession = () => {
   try {
@@ -14,6 +15,18 @@ const setSession = (session) => {
 
 const clearSession = () => {
   localStorage.removeItem(SESSION_KEY);
+};
+
+const getMsalSession = () => {
+  try {
+    return JSON.parse(localStorage.getItem(MSAL_SESSION_KEY));
+  } catch {
+    return null;
+  }
+};
+
+const setMsalSession = (session) => {
+  localStorage.setItem(MSAL_SESSION_KEY, JSON.stringify(session));
 };
 
 const getActiveClientId = () => getSession()?.cliente?.id || null;
@@ -35,14 +48,18 @@ const setupInputConstraints = () => {
 };
 
 const updateAuthControls = () => {
-  const hasSession = Boolean(getSession()?.token);
-  const hasAdminSession = hasSession && isAdminSession();
   const session = getSession();
+  const msalSession = getMsalSession();
+  const hasSession = Boolean(session?.token || msalSession?.token);
+  const hasAdminSession = hasSession && isAdminSession();
+  const activeSession = session || msalSession;
 
   // Mostrar nombre del usuario si está logueado
   const userNameElement = document.getElementById("user-name");
-  if (userNameElement && session?.cliente?.nombres) {
-    userNameElement.textContent = session.cliente.nombres;
+  if (userNameElement && activeSession?.cliente?.nombres) {
+    userNameElement.textContent = activeSession.cliente.nombres;
+  } else if (userNameElement && msalSession?.displayName) {
+    userNameElement.textContent = msalSession.displayName;
   }
 
   document.querySelectorAll(".auth-guest-only").forEach((element) => {
@@ -91,7 +108,8 @@ const validateSession = async () => {
 const setupLogout = () => {
   document.querySelectorAll("[data-logout]").forEach((button) => {
     button.addEventListener("click", async () => {
-      const token = getSession()?.token;
+      const session = getSession();
+      const token = session?.token;
 
       if (token) {
         try {
@@ -104,6 +122,7 @@ const setupLogout = () => {
       }
 
       clearSession();
+      localStorage.removeItem(MSAL_SESSION_KEY);
       updateAuthControls();
       window.location.href = "index.html";
     });
@@ -182,7 +201,7 @@ const setupRegisterForm = () => {
 
       const session = await response.json();
       setSession(session);
-      const redirectUrl = isAdminSession() ? "dashboard.html" : "index.html";
+      const redirectUrl = session?.cliente?.rol === "ADMIN" ? "dashboard.html" : "index.html";
       window.location.href = redirectUrl;
     } catch (error) {
       console.error("Error registrando usuario:", error);
@@ -226,7 +245,7 @@ const setupLoginForm = () => {
 
       const session = await response.json();
       setSession(session);
-      const redirectUrl = isAdminSession() ? "dashboard.html" : "index.html";
+      const redirectUrl = session?.cliente?.rol === "ADMIN" ? "dashboard.html" : "index.html";
       window.location.href = redirectUrl;
     } catch (error) {
       console.error("Error iniciando sesion:", error);
@@ -234,6 +253,25 @@ const setupLoginForm = () => {
       if (button) button.disabled = false;
     }
   });
+};
+
+// Función para procesar respuesta de MSAL
+const handleMsalLoginResponse = (response) => {
+  if (response && response.account) {
+    const msalSessionData = {
+      token: response.accessToken || response.idToken || "msal_token",
+      displayName: response.account.name || response.account.username,
+      email: response.account.username,
+      cliente: {
+        nombres: response.account.name || response.account.username,
+        email: response.account.username,
+        id: response.account.homeAccountId,
+        rol: "USER"
+      }
+    };
+    setMsalSession(msalSessionData);
+    updateAuthControls();
+  }
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -245,4 +283,14 @@ document.addEventListener("DOMContentLoaded", () => {
   validateSession();
 });
 
-export { clearSession, getActiveClientId, getSession, isAdminSession, updateAuthControls, validateSession };
+export { 
+  clearSession, 
+  getActiveClientId, 
+  getSession, 
+  getMsalSession,
+  handleMsalLoginResponse,
+  isAdminSession, 
+  setMsalSession,
+  updateAuthControls, 
+  validateSession 
+};
