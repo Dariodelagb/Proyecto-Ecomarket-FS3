@@ -2,6 +2,8 @@ package com.ecomarket.db.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -11,8 +13,17 @@ public class Venta {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column (name = "tipo_envio")
     private String tipoEnvio;
+
+    @Column (name = "monto")
     private Double monto;
+
+    @Column (name = "fecha")
+    private Date fecha;
+
+    @Column (name = "estado")
+    private String estado;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
