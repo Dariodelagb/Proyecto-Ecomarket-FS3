@@ -26,18 +26,17 @@ const clearSession = () => {
   localStorage.removeItem(SESSION_KEY);
 };
 
-const getMsalSession = () => readJson(sessionStorage, MSAL_SESSION_KEY);
+const getMsalSession = () => readJson(localStorage, MSAL_SESSION_KEY);
 
 const setMsalSession = (session) => {
   if (session) {
-    sessionStorage.setItem(MSAL_SESSION_KEY, JSON.stringify(session));
+    localStorage.setItem(MSAL_SESSION_KEY, JSON.stringify(session));
   } else {
-    sessionStorage.removeItem(MSAL_SESSION_KEY);
+    localStorage.removeItem(MSAL_SESSION_KEY);
   }
 
-  // Las versiones anteriores guardaban esta sesion en localStorage y podian
-  // mostrar un usuario antiguo despues de cerrar el navegador.
-  localStorage.removeItem(MSAL_SESSION_KEY);
+  // Limpia los datos temporales usados por las versiones anteriores.
+  sessionStorage.removeItem(MSAL_SESSION_KEY);
   sessionStorage.removeItem("access_token");
 };
 
