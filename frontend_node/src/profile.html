@@ -7,7 +7,7 @@
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Perfil de Admin | EcoMarket</title>
+    <title>Mi perfil | EcoMarket</title>
   </head>
   <body
     x-data="{ page: 'profile', 'loaded': true, 'darkMode': false, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false, 'isProfileInfoModal': false, 'isProfileAddressModal': false }"
@@ -53,7 +53,7 @@
               <h3
                 class="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7"
               >
-                Perfil de Admin
+                Mi perfil
               </h3>
 
               <div
@@ -73,8 +73,9 @@
                     <div class="order-3 xl:order-2">
                       <h4
                         class="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left"
+                        data-auth-user-name
                       >
-                        EcoMarket Admin
+                        Usuario
                       </h4>
                       <div
                         class="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left"
@@ -215,8 +216,9 @@
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
+                          data-auth-user-name
                         >
-                          Admin
+                          Usuario
                         </p>
                       </div>
 
@@ -228,9 +230,8 @@
                         </p>
                         <p
                           class="text-sm font-medium text-gray-800 dark:text-white/90"
-                        >
-                          admin@ecomarket.com
-                        </p>
+                          data-auth-user-email
+                        ></p>
                       </div>
 
                       <div>

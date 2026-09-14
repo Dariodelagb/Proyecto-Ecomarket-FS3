@@ -1,13 +1,22 @@
+import {
+  isMicrosoftAuthenticationPopup,
+  restoreMicrosoftSession,
+  signInWithMicrosoft,
+  signOutFromMicrosoft,
+} from "../msal-config";
+
 const SESSION_KEY = "ecomarketSession";
 const MSAL_SESSION_KEY = "msalSession";
 
-const getSession = () => {
+const readJson = (storage, key) => {
   try {
-    return JSON.parse(localStorage.getItem(SESSION_KEY));
+    return JSON.parse(storage.getItem(key));
   } catch {
     return null;
   }
 };
+
+const getSession = () => readJson(localStorage, SESSION_KEY);
 
 const setSession = (session) => {
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
@@ -17,16 +26,43 @@ const clearSession = () => {
   localStorage.removeItem(SESSION_KEY);
 };
 
-const getMsalSession = () => {
-  try {
-    return JSON.parse(localStorage.getItem(MSAL_SESSION_KEY));
-  } catch {
-    return null;
-  }
-};
+const getMsalSession = () => readJson(sessionStorage, MSAL_SESSION_KEY);
 
 const setMsalSession = (session) => {
-  localStorage.setItem(MSAL_SESSION_KEY, JSON.stringify(session));
+  if (session) {
+    sessionStorage.setItem(MSAL_SESSION_KEY, JSON.stringify(session));
+  } else {
+    sessionStorage.removeItem(MSAL_SESSION_KEY);
+  }
+
+  // Las versiones anteriores guardaban esta sesion en localStorage y podian
+  // mostrar un usuario antiguo despues de cerrar el navegador.
+  localStorage.removeItem(MSAL_SESSION_KEY);
+  sessionStorage.removeItem("access_token");
+};
+
+const getActiveSession = () => getSession() || getMsalSession();
+
+const getActiveProfile = () => {
+  const session = getActiveSession();
+  const cliente = session?.cliente || {};
+  const givenName = session?.givenName || cliente.nombres || "";
+  const familyName = session?.familyName || cliente.apellidos || "";
+  const displayName =
+    session?.displayName ||
+    [givenName, familyName].filter(Boolean).join(" ") ||
+    session?.email ||
+    cliente.email ||
+    "";
+
+  return {
+    displayName,
+    givenName,
+    familyName,
+    email: session?.email || cliente.email || "",
+    rut: cliente.rut || "",
+    dvrut: cliente.dvrut || "",
+  };
 };
 
 const getActiveClientId = () => getSession()?.cliente?.id || null;
@@ -47,20 +83,21 @@ const setupInputConstraints = () => {
   });
 };
 
-const updateAuthControls = () => {
-  const session = getSession();
-  const msalSession = getMsalSession();
-  const hasSession = Boolean(session?.token || msalSession?.token);
-  const hasAdminSession = hasSession && isAdminSession();
-  const activeSession = session || msalSession;
+const setText = (selector, value, fallback = "") => {
+  document.querySelectorAll(selector).forEach((element) => {
+    element.textContent = value || fallback;
+  });
+};
 
-  // Mostrar nombre del usuario si está logueado
-  const userNameElement = document.getElementById("user-name");
-  if (userNameElement && activeSession?.cliente?.nombres) {
-    userNameElement.textContent = activeSession.cliente.nombres;
-  } else if (userNameElement && msalSession?.displayName) {
-    userNameElement.textContent = msalSession.displayName;
-  }
+const updateAuthControls = () => {
+  const hasSession = Boolean(getSession()?.token || getMsalSession()?.authenticated);
+  const hasAdminSession = hasSession && isAdminSession();
+  const profile = getActiveProfile();
+
+  setText("[data-auth-user-name], #user-name", profile.displayName, "Usuario");
+  setText("[data-auth-given-name]", profile.givenName, "Usuario");
+  setText("[data-auth-family-name]", profile.familyName);
+  setText("[data-auth-user-email]", profile.email);
 
   document.querySelectorAll(".auth-guest-only").forEach((element) => {
     element.hidden = hasSession;
@@ -73,6 +110,29 @@ const updateAuthControls = () => {
   document.querySelectorAll(".auth-admin-only").forEach((element) => {
     element.hidden = !hasAdminSession;
   });
+};
+
+const fillEmptyField = (selector, value) => {
+  if (!value) return;
+
+  document.querySelectorAll(selector).forEach((input) => {
+    if (!input.value.trim()) {
+      input.value = value;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  });
+};
+
+const autofillUserFields = () => {
+  const profile = getActiveProfile();
+  if (!profile.displayName && !profile.email) return;
+
+  fillEmptyField('[data-auth-field="given-name"]', profile.givenName);
+  fillEmptyField('[data-auth-field="family-name"]', profile.familyName);
+  fillEmptyField('[data-auth-field="full-name"]', profile.displayName);
+  fillEmptyField('[data-auth-field="email"]', profile.email);
+  fillEmptyField('[data-auth-field="rut"]', profile.rut);
+  fillEmptyField('[data-auth-field="rut-dv"]', profile.dvrut);
 };
 
 const validateSession = async () => {
@@ -98,6 +158,7 @@ const validateSession = async () => {
 
     setSession(freshSession);
     updateAuthControls();
+    autofillUserFields();
     return freshSession;
   } catch (error) {
     console.error("Error validando sesion:", error);
@@ -107,23 +168,37 @@ const validateSession = async () => {
 
 const setupLogout = () => {
   document.querySelectorAll("[data-logout]").forEach((button) => {
-    button.addEventListener("click", async () => {
-      const session = getSession();
-      const token = session?.token;
+    button.addEventListener("click", async (event) => {
+      event.preventDefault();
 
-      if (token) {
+      const session = getSession();
+      const originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = "Cerrando sesion...";
+
+      if (session?.token) {
         try {
-          await fetch(`/api/auth/sesion/${encodeURIComponent(token)}`, {
+          await fetch(`/api/auth/sesion/${encodeURIComponent(session.token)}`, {
             method: "DELETE",
           });
         } catch (error) {
-          console.error("Error cerrando sesion:", error);
+          console.error("Error cerrando la sesion local:", error);
         }
       }
 
       clearSession();
-      localStorage.removeItem(MSAL_SESSION_KEY);
+      setMsalSession(null);
       updateAuthControls();
+
+      try {
+        // Tambien consulta la cache real de MSAL para cerrar cuentas que aun
+        // no alcanzaron a sincronizarse con el estado visual.
+        await signOutFromMicrosoft();
+      } catch (error) {
+        console.error("Error cerrando la sesion de Microsoft:", error);
+      }
+
+      button.textContent = originalText;
       window.location.href = "index.html";
     });
   });
@@ -149,14 +224,14 @@ const getAddressPayload = (form) => {
 
 const getResponseMessage = async (response, fallback) => {
   try {
-    const text = await response.text();
-    if (!text) return fallback;
+    const responseText = await response.text();
+    if (!responseText) return fallback;
 
     try {
-      const data = JSON.parse(text);
+      const data = JSON.parse(responseText);
       return data.message || data.detail || data.error || fallback;
     } catch {
-      return text;
+      return responseText;
     }
   } catch {
     return fallback;
@@ -255,42 +330,82 @@ const setupLoginForm = () => {
   });
 };
 
-// Función para procesar respuesta de MSAL
-const handleMsalLoginResponse = (response) => {
-  if (response && response.account) {
-    const msalSessionData = {
-      token: response.accessToken || response.idToken || "msal_token",
-      displayName: response.account.name || response.account.username,
-      email: response.account.username,
-      cliente: {
-        nombres: response.account.name || response.account.username,
-        email: response.account.username,
-        id: response.account.homeAccountId,
-        rol: "USER"
+const setupMicrosoftLogin = () => {
+  const button = document.querySelector("[data-msal-signin]");
+  if (!button) return;
+
+  const status = document.getElementById("login-status");
+
+  button.addEventListener("click", async () => {
+    const form = document.getElementById("login-form");
+    const submitButton = form?.querySelector('button[type="submit"]');
+    button.disabled = true;
+    if (submitButton) submitButton.disabled = true;
+    if (status) status.textContent = "Conectando con Microsoft...";
+
+    try {
+      const microsoftSession = await signInWithMicrosoft();
+      if (!microsoftSession) return;
+
+      clearSession();
+      setMsalSession(microsoftSession);
+      updateAuthControls();
+      autofillUserFields();
+      window.location.href = "index.html";
+    } catch (error) {
+      console.error("Error iniciando sesion con Microsoft:", error);
+      if (status) {
+        status.textContent = "No se pudo iniciar sesion con Microsoft. Intenta nuevamente.";
       }
-    };
-    setMsalSession(msalSessionData);
-    updateAuthControls();
-  }
+      button.disabled = false;
+      if (submitButton) submitButton.disabled = false;
+    }
+  });
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+const initializeAuth = async () => {
   setupInputConstraints();
-  updateAuthControls();
   setupLogout();
   setupRegisterForm();
   setupLoginForm();
-  validateSession();
-});
+  setupMicrosoftLogin();
 
-export { 
-  clearSession, 
-  getActiveClientId, 
-  getSession, 
+  // Muestra de inmediato cualquier sesion ya sincronizada y luego confirma
+  // la cuenta real guardada por MSAL.
+  updateAuthControls();
+  autofillUserFields();
+
+  const localSessionPromise = validateSession();
+  const microsoftSessionPromise = restoreMicrosoftSession().catch((error) => {
+    console.error("Error restaurando la sesion de Microsoft:", error);
+    return null;
+  });
+  const [, microsoftSession] = await Promise.all([
+    localSessionPromise,
+    microsoftSessionPromise,
+  ]);
+  setMsalSession(microsoftSession);
+
+  updateAuthControls();
+  autofillUserFields();
+};
+
+// La pagina configurada como redirectUri tambien se carga dentro del popup.
+// No debe procesar la respuesta: la instancia MSAL de la ventana principal
+// observa esa URL, obtiene el resultado y cierra el popup automaticamente.
+if (!isMicrosoftAuthenticationPopup()) {
+  document.addEventListener("DOMContentLoaded", initializeAuth);
+}
+
+export {
+  autofillUserFields,
+  clearSession,
+  getActiveClientId,
+  getActiveProfile,
   getMsalSession,
-  handleMsalLoginResponse,
-  isAdminSession, 
+  getSession,
+  isAdminSession,
   setMsalSession,
-  updateAuthControls, 
-  validateSession 
+  updateAuthControls,
+  validateSession,
 };

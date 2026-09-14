@@ -17,10 +17,13 @@
         <a href="productos.html">Productos</a>
       </nav>
       <div class="home-auth-actions">
-        <a class="home-auth-link auth-guest-only" href="registro.html">Registrarse</a>
-        <a class="home-auth-link auth-guest-only" href="login.html">Iniciar sesion</a>
+        <a class="home-auth-link auth-guest-only" href="registro.html" hidden>Registrarse</a>
+        <a class="home-auth-link auth-guest-only" href="login.html" hidden>Iniciar sesion</a>
         <a class="home-auth-link auth-admin-only" href="dashboard.html" hidden>Dashboard</a>
-        <button class="home-auth-link auth-session-only" type="button" data-logout>Cerrar sesion</button>
+        <a class="home-auth-link auth-session-only" href="profile.html" hidden>
+          <span data-auth-user-name>Usuario</span>
+        </a>
+        <button class="home-auth-link auth-session-only" type="button" data-logout hidden>Cerrar sesion</button>
       </div>
       <a class="home-cart-link" href="carrito.html" aria-label="Ver carrito">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -40,13 +43,13 @@
 
         <form class="auth-form" id="register-form">
           <div class="auth-grid">
-            <label>Nombre<input name="nombres" type="text" required /></label>
-            <label>Apellido<input name="apellidos" type="text" required /></label>
+            <label>Nombre<input name="nombres" type="text" autocomplete="given-name" data-auth-field="given-name" required /></label>
+            <label>Apellido<input name="apellidos" type="text" autocomplete="family-name" data-auth-field="family-name" required /></label>
             <label>RUT<input name="rut" type="text" inputmode="numeric" maxlength="8" pattern="[0-9]{1,8}" required /></label>
             <label>DV<input name="dvrut" type="text" maxlength="1" required /></label>
           </div>
-          <label>Correo<input name="email" type="email" required /></label>
-          <label>Contrasena<input name="contrasena" type="password" minlength="4" maxlength="16" required /></label>
+          <label>Correo<input name="email" type="email" autocomplete="email" data-auth-field="email" required /></label>
+          <label>Contrasena<input name="contrasena" type="password" autocomplete="new-password" minlength="4" maxlength="16" required /></label>
 
           <fieldset>
             <legend>Direccion opcional</legend>

@@ -36,7 +36,7 @@
         <a class="home-auth-link auth-guest-only" href="login.html" hidden>Iniciar sesion</a>
         <a class="home-auth-link auth-admin-only" href="dashboard.html" hidden>Dashboard</a>
         <a class="home-auth-link auth-session-only" href="profile.html" hidden>
-          <span id="user-name">Usuario</span>
+          <span data-auth-user-name>Usuario</span>
         </a>
         <button class="home-auth-link auth-session-only" type="button" data-logout hidden>Cerrar sesion</button>
       </div>
@@ -146,11 +146,11 @@
         <form class="home-form" id="contact-form">
           <label>
             Nombre
-            <input type="text" name="nombre" placeholder="Tu nombre" required />
+            <input type="text" name="nombre" autocomplete="name" data-auth-field="full-name" placeholder="Tu nombre" required />
           </label>
           <label>
             Correo
-            <input type="email" name="correo" placeholder="correo@ejemplo.cl" required />
+            <input type="email" name="correo" autocomplete="email" data-auth-field="email" placeholder="correo@ejemplo.cl" required />
           </label>
           <label>
             Mensaje

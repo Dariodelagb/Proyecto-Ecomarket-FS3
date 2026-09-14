@@ -854,6 +854,12 @@ button.home-auth-link {
   appearance: none;
 }
 
+.auth-guest-only[hidden],
+.auth-session-only[hidden],
+.auth-admin-only[hidden] {
+  display: none !important;
+}
+
 .home-cart-link {
   position: relative;
   display: inline-flex;
@@ -1962,12 +1968,50 @@ button.home-auth-link {
   font-weight: 900;
 }
 
-.auth-form button[type="submit"] {
+.auth-form button[type="submit"],
+.auth-microsoft-button {
   min-height: 48px;
   border-radius: 8px;
   background: #136f63;
   color: #ffffff;
   font-weight: 900;
+}
+
+.auth-microsoft-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.92);
+  color: #17211a;
+}
+
+.auth-microsoft-button:hover {
+  background: #ffffff;
+}
+
+.auth-microsoft-button svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  height: 1px;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.24);
+  content: "";
 }
 
 .auth-form button:disabled {

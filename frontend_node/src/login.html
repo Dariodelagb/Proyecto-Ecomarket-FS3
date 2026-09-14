@@ -17,10 +17,13 @@
         <a href="productos.html">Productos</a>
       </nav>
       <div class="home-auth-actions">
-        <a class="home-auth-link auth-guest-only" href="registro.html">Registrarse</a>
-        <a class="home-auth-link auth-guest-only" href="login.html">Iniciar sesion</a>
+        <a class="home-auth-link auth-guest-only" href="registro.html" hidden>Registrarse</a>
+        <a class="home-auth-link auth-guest-only" href="login.html" hidden>Iniciar sesion</a>
         <a class="home-auth-link auth-admin-only" href="dashboard.html" hidden>Dashboard</a>
-        <button class="home-auth-link auth-session-only" type="button" data-logout>Cerrar sesion</button>
+        <a class="home-auth-link auth-session-only" href="profile.html" hidden>
+          <span data-auth-user-name>Usuario</span>
+        </a>
+        <button class="home-auth-link auth-session-only" type="button" data-logout hidden>Cerrar sesion</button>
       </div>
       <a class="home-cart-link" href="carrito.html" aria-label="Ver carrito">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -39,25 +42,28 @@
         </div>
 
         <form class="auth-form" id="login-form">
-          <label>Correo<input name="email" type="email" required /></label>
+          <label>Correo<input name="email" type="email" autocomplete="email" data-auth-field="email" required /></label>
           <div class="auth-grid">
             <label>RUT<input name="rut" type="text" inputmode="numeric" maxlength="8" pattern="[0-9]{1,8}" required /></label>
             <label>DV<input name="dvrut" type="text" maxlength="1" required /></label>
           </div>
-          <label>Contrasena<input name="contrasena" type="password" maxlength="16" required /></label>
+          <label>Contrasena<input name="contrasena" type="password" autocomplete="current-password" maxlength="16" required /></label>
           <p class="home-form__status" id="login-status" aria-live="polite"></p>
           <button type="submit">Iniciar sesion</button>
+
+          <div class="auth-divider" aria-hidden="true"><span>o</span></div>
+          <button class="auth-microsoft-button" type="button" data-msal-signin>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="#f35325" d="M2 2h9v9H2z" />
+              <path fill="#81bc06" d="M13 2h9v9h-9z" />
+              <path fill="#05a6f0" d="M2 13h9v9H2z" />
+              <path fill="#ffba08" d="M13 13h9v9h-9z" />
+            </svg>
+            Iniciar con Microsoft
+          </button>
         </form>
-
-        <!-- MSAL buttons -->
-        <div style="margin-top:1rem">
-          <button id="msal-signin" type="button">Iniciar sesión con Microsoft</button>
-          <button id="msal-signout" type="button">Cerrar sesión</button>
-        </div>
-
       </section>
     </main>
 
-    <!-- No CDN: MSAL se incluirá en bundle generado por webpack -->
   </body>
 </html>

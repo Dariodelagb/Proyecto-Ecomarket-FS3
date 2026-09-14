@@ -28,8 +28,6 @@ import "./components/cart-badge-loader";
 import "./components/cart-page-loader";
 import "./components/checkout-loader";
 
-import { signIn, signOut } from "./msal-config";
-
 Alpine.plugin(persist);
 window.Alpine = Alpine;
 Alpine.start();
@@ -132,28 +130,4 @@ document.addEventListener("DOMContentLoaded", function () {
       focusSearchInput();
     }
   });
-});
-
-// Attach MSAL handlers to DOM buttons (if present)
-document.addEventListener("DOMContentLoaded", () => {
-  const msalSignInBtn = document.getElementById("msal-signin");
-  const msalSignOutBtn = document.getElementById("msal-signout");
-
-  if (msalSignInBtn) {
-    msalSignInBtn.addEventListener("click", async () => {
-      try {
-        await signIn();
-        window.location.href = "profile.html";
-      } catch (e) {
-        console.error("Login error", e);
-        alert("Error al iniciar sesión: " + (e && e.message ? e.message : e));
-      }
-    });
-  }
-
-  if (msalSignOutBtn) {
-    msalSignOutBtn.addEventListener("click", () => {
-      signOut();
-    });
-  }
 });
