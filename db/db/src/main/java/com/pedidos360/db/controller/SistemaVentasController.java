@@ -381,28 +381,62 @@ public class SistemaVentasController {
     // --- VENTAS ---
     @PostMapping("/ventas")
     @Transactional
-    public Venta registrarVenta(@RequestBody Venta venta) {
+    public Venta registrarVenta(
+        @RequestBody Venta venta,
+        @RequestHeader("X-Session-Token") String token
+    ) {
+        Cliente actor = pedidoService.autenticar(token);
+        boolean esAdmin = "ADMIN".equals(actor.getRol());
+        boolean esCliente = "CLIENTE".equals(actor.getRol());
+        if (!esAdmin && !esCliente) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.FORBIDDEN,
+                "Solo clientes y administradores pueden crear ventas"
+            );
+        }
+
         venta.setEstado(EstadoPedido.CREADO);
         if (venta.getFecha() == null) {
             venta.setFecha(LocalDate.now());
         }
 
-        if (venta.getCliente() != null && venta.getCliente().getId() != null) {
+        if (esCliente) {
+            venta.setCliente(actor);
+        } else if (venta.getCliente() != null && venta.getCliente().getId() != null) {
             Cliente clienteReal = clienteRepo.findById(venta.getCliente().getId())
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
             venta.setCliente(clienteReal);
+        } else {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.BAD_REQUEST,
+                "Debes seleccionar un cliente"
+            );
         }
 
         if (venta.getDireccion() != null && venta.getDireccion().getId() != null) {
             Direccion direccionReal = direccionRepo.findById(venta.getDireccion().getId())
                 .orElseThrow(() -> new RuntimeException("Direccion no encontrada"));
 
+            if (direccionReal.getCliente() == null
+                || !direccionReal.getCliente().getId().equals(venta.getCliente().getId())) {
+                throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "La direccion no pertenece al cliente seleccionado"
+                );
+            }
+
             venta.setDireccion(direccionReal);
         }
 
         // Es vital asignar la venta a cada detalle antes de guardar
-        if (venta.getDetalles() != null) {
+        if (venta.getDetalles() == null || venta.getDetalles().isEmpty()) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.BAD_REQUEST,
+                "La venta debe contener al menos un producto"
+            );
+        } else {
+            double montoCalculado = 0;
             for (DetalleVenta detalle : venta.getDetalles()) {
                 detalle.setVenta(venta);
                 if (detalle.getProducto() != null && detalle.getProducto().getId() != null) {
@@ -410,14 +444,29 @@ public class SistemaVentasController {
                         .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
                     detalle.setProducto(productoReal);
+                    int cantidad = detalle.getCantidad() == null ? 0 : detalle.getCantidad();
+                    if (cantidad < 1) {
+                        throw new org.springframework.web.server.ResponseStatusException(
+                            org.springframework.http.HttpStatus.BAD_REQUEST,
+                            "La cantidad de cada producto debe ser mayor que cero"
+                        );
+                    }
+                    detalle.setPrecioUnitario(productoReal.getPrecio().doubleValue());
+                    montoCalculado += productoReal.getPrecio() * cantidad;
+                } else {
+                    throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.BAD_REQUEST,
+                        "Cada detalle debe indicar un producto"
+                    );
                 }
                 if (detalle.getFecha() == null) {
                     detalle.setFecha(LocalDate.now());
                 }
             }
+            venta.setMonto(montoCalculado);
         }
         Venta guardada = ventaRepo.save(venta);
-        pedidoService.auditarCreacion(guardada);
+        pedidoService.auditarCreacion(guardada, actor);
         return guardada;
     }
 

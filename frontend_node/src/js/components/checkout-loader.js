@@ -304,7 +304,10 @@ const createSale = async (form) => {
 
   const response = await fetch("/api/ventas", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "X-Session-Token": session.token,
+    },
     body: JSON.stringify(payload),
   });
 

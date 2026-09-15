@@ -101,10 +101,12 @@ const initializeOrders = () => {
   const session = getSession();
   const token = session?.token;
   const role = session?.cliente?.rol;
-  const mode = container.dataset.ordersMode;
+  const requestedMode = container.dataset.ordersMode;
+  const mode = requestedMode === "auto" ? (role === "ADMIN" ? "admin" : "client") : requestedMode;
   const canEdit = role === "ADMIN" || role === "OPERADOR";
 
-  if (!token || (mode === "admin" && role !== "ADMIN") || (mode === "operator" && !canEdit)) {
+  const invalidAutoRole = requestedMode === "auto" && !["ADMIN", "CLIENTE"].includes(role);
+  if (!token || invalidAutoRole || (mode === "admin" && role !== "ADMIN") || (mode === "operator" && !canEdit)) {
     window.location.href = token ? "index.html" : "login.html";
     return;
   }
@@ -179,6 +181,13 @@ const initializeOrders = () => {
       loading = false;
     }
   };
+
+  window.addEventListener("pedidos360:orders-updated", () => {
+    tableBody.innerHTML = "";
+    page = 0;
+    finished = false;
+    loadNextPage();
+  });
 
   tableBody.addEventListener("change", async (event) => {
     const select = event.target.closest("[data-order-state]");

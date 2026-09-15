@@ -3,6 +3,9 @@ const glob = require("glob");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
+const apiTarget = process.env.PEDIDOS360_API_TARGET || "http://34.231.143.20:8080";
+const reportsTarget = process.env.PEDIDOS360_REPORTS_TARGET || "http://34.231.143.20:8082";
+
 const INCLUDE_PATTERN =
   /<include\s+src=["'](.+?)["']\s*\/?>\s*(?:<\/include>)?/gis;
 
@@ -47,6 +50,19 @@ module.exports = {
     compress: true,
     port: 3000,
     hot: true,
+    proxy: [
+      {
+        context: ["/api"],
+        target: apiTarget,
+        changeOrigin: true,
+      },
+      {
+        context: ["/reportes"],
+        target: reportsTarget,
+        changeOrigin: true,
+        pathRewrite: { "^/reportes": "" },
+      },
+    ],
   },
   module: {
     rules: [

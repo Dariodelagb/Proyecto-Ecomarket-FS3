@@ -28,6 +28,7 @@ import "./components/cart-badge-loader";
 import "./components/cart-page-loader";
 import "./components/checkout-loader";
 import "./components/orders-loader";
+import "./components/admin-sale-form-loader";
 
 Alpine.plugin(persist);
 window.Alpine = Alpine;

@@ -280,3 +280,33 @@ docker-compose up --build
 El script de inicialización (01-init.sql) se ejecuta automáticamente la primera vez que se crea el contenedor de base de datos.
 
 El contenedor de la aplicación de ventas espera automáticamente a que la base de datos esté lista antes de arrancar.
+# Ejecucion distribuida: backend en EC2 y frontend local
+
+El backend Spring Boot puede ejecutarse directamente en una instancia Linux, sin usar su contenedor. Desde la carpeta `db/db`, configura la conexion a MySQL y arranca el servicio:
+
+```bash
+export SPRING_DATASOURCE_URL='jdbc:mysql://HOST_MYSQL:3306/sistema_ventas?createDatabaseIfNotExist=true&serverTimezone=UTC'
+export SPRING_DATASOURCE_USERNAME='pedidos360_app'
+export SPRING_DATASOURCE_PASSWORD='CAMBIAR_ESTA_CLAVE'
+export PEDIDOS360_REPORTES_INTERNAL_KEY='CAMBIAR_ESTA_CLAVE_INTERNA'
+sh ./run-linux.sh
+```
+
+El script usa `sh ./mvnw`, por lo que funciona aunque Git no haya conservado el permiso ejecutable de `mvnw`. Spring escucha en `0.0.0.0:8080` para recibir conexiones externas.
+
+En el Security Group de EC2 se debe permitir TCP `8080` solamente desde la IP publica del equipo que ejecuta el frontend. Si se utiliza reporteria, se debe permitir tambien TCP `8082` desde esa misma IP. MySQL no necesita quedar expuesto al computador del usuario cuando se encuentra en la misma instancia o red privada que Spring Boot.
+
+El frontend local esta configurado para redirigir por defecto:
+
+```text
+/api       -> http://34.231.143.20:8080/api
+/reportes  -> http://34.231.143.20:8082
+```
+
+Se inicia desde `frontend_node` con `npm start`. Los destinos se pueden reemplazar sin editar codigo:
+
+```powershell
+$env:PEDIDOS360_API_TARGET="http://OTRA_IP:8080"
+$env:PEDIDOS360_REPORTS_TARGET="http://OTRA_IP:8082"
+npm start
+```

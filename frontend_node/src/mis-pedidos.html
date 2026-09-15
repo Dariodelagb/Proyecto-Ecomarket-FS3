@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Mis pedidos | Pedidos360</title>
+    <title>Pedidos | Pedidos360</title>
   </head>
-  <body class="home-page role-orders-page" data-required-role="CLIENTE">
+  <body class="home-page role-orders-page" data-required-role="CLIENTE,ADMIN">
     <header class="home-nav">
       <a href="index.html" class="home-brand">
         <img src="./images/logo/pedidos360_icon.png" alt="Pedidos360" class="home-brand__logo" />
@@ -15,9 +15,11 @@
       <nav class="home-menu" aria-label="Navegacion principal">
         <a href="index.html">Inicio</a>
         <a href="productos.html">Catalogo</a>
-        <a href="mis-pedidos.html" aria-current="page">Mis pedidos</a>
+        <a class="auth-client-only" href="mis-pedidos.html" aria-current="page">Mis pedidos</a>
+        <a class="auth-admin-only" href="mis-pedidos.html" aria-current="page" hidden>Pedidos</a>
       </nav>
       <div class="home-auth-actions">
+        <a class="home-auth-link auth-admin-only" href="dashboard.html" hidden>Dashboard</a>
         <a class="home-cart-link" href="carrito.html" aria-label="Abrir carrito">
           <span aria-hidden="true">Carrito</span>
           <span class="home-cart-count" data-cart-count>0</span>
@@ -28,12 +30,66 @@
 
     <main class="role-orders-main">
       <section class="role-orders-heading">
-        <p class="role-orders-eyebrow">Seguimiento personal</p>
-        <h1>Mis ultimos pedidos</h1>
-        <p>Aqui puedes consultar exclusivamente tus compras recientes y su estado actual.</p>
+        <p class="role-orders-eyebrow auth-client-only">Seguimiento personal</p>
+        <p class="role-orders-eyebrow auth-admin-only" hidden>Gestion de pedidos</p>
+        <h1 class="auth-client-only">Mis ultimos pedidos</h1>
+        <h1 class="auth-admin-only" hidden>Todos los pedidos</h1>
+        <p class="auth-client-only">Aqui puedes consultar exclusivamente tus compras recientes y su estado actual.</p>
+        <p class="auth-admin-only" hidden>Consulta las ventas registradas, actualiza sus estados y crea pedidos manualmente.</p>
       </section>
 
-      <section class="orders-panel" data-orders-mode="client">
+      <section class="admin-sale-panel auth-admin-only" hidden>
+        <div class="admin-sale-panel__heading">
+          <div>
+            <p class="role-orders-eyebrow">Nueva venta</p>
+            <h2>Crear pedido</h2>
+          </div>
+          <p id="admin-sale-status" class="admin-sale-status" role="status"></p>
+        </div>
+
+        <form id="admin-sale-form" class="admin-sale-form">
+          <label>
+            <span>Cliente</span>
+            <select id="admin-sale-client" name="clienteId" required>
+              <option value="">Selecciona un cliente</option>
+            </select>
+          </label>
+          <label>
+            <span>Direccion</span>
+            <select id="admin-sale-address" name="direccionId" disabled>
+              <option value="">Sin direccion</option>
+            </select>
+          </label>
+          <label>
+            <span>Producto</span>
+            <select id="admin-sale-product" name="productoId" required>
+              <option value="">Selecciona un producto</option>
+            </select>
+          </label>
+          <label>
+            <span>Cantidad</span>
+            <input id="admin-sale-quantity" name="cantidad" type="number" min="1" max="999" value="1" required />
+          </label>
+          <label>
+            <span>Tipo de envio</span>
+            <select id="admin-sale-shipping" name="tipoEnvio" required>
+              <option value="Envio a domicilio">Envio a domicilio</option>
+              <option value="Retiro en tienda">Retiro en tienda</option>
+            </select>
+          </label>
+          <label>
+            <span>Precio unitario</span>
+            <input id="admin-sale-unit-price" type="text" value="$0" readonly />
+          </label>
+          <div class="admin-sale-total">
+            <span>Total</span>
+            <strong id="admin-sale-total">$0</strong>
+          </div>
+          <button class="admin-sale-submit" type="submit">Crear venta</button>
+        </form>
+      </section>
+
+      <section class="orders-panel" data-orders-mode="auto">
         <div class="w-full overflow-x-auto">
           <table class="min-w-[760px] w-full">
             <thead>
@@ -49,6 +105,7 @@
           </table>
         </div>
         <p id="orders-load-status" class="orders-load-status" role="status"></p>
+        <div id="orders-scroll-sentinel" class="orders-scroll-sentinel" aria-hidden="true"></div>
       </section>
     </main>
   </body>

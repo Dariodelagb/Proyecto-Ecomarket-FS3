@@ -113,8 +113,7 @@ public class PedidoService {
         return sesion.getCliente();
     }
 
-    public void auditarCreacion(Venta venta) {
-        Cliente actor = venta.getCliente();
+    public void auditarCreacion(Venta venta, Cliente actor) {
         if (actor != null) {
             auditar(actor, venta.getId(), "PEDIDO_CREADO", "Estado inicial CREADO");
         }
