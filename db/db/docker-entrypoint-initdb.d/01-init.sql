@@ -1,5 +1,5 @@
 -- ============================================================
--- SCRIPT DE INICIALIZACIÓN - ECOMARKET
+-- SCRIPT DE INICIALIZACION - PEDIDOS360
 -- Se ejecuta automáticamente al iniciar el contenedor MySQL
 -- ============================================================
 
@@ -100,10 +100,25 @@ CREATE TABLE IF NOT EXISTS venta (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     tipo_envio VARCHAR(50),
     monto DOUBLE NOT NULL,
+    fecha DATE NOT NULL,
+    estado VARCHAR(30) NOT NULL DEFAULT 'CREADO',
     cliente_id BIGINT,
     direccion_id BIGINT,
     FOREIGN KEY (cliente_id) REFERENCES cliente(id),
     FOREIGN KEY (direccion_id) REFERENCES direccion(id)
+);
+
+-- 8. Tabla de auditoria de operaciones
+CREATE TABLE IF NOT EXISTS registro_auditoria (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    fecha DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    accion VARCHAR(80) NOT NULL,
+    entidad VARCHAR(80) NOT NULL,
+    entidad_id BIGINT,
+    actor_id BIGINT,
+    actor_nombre VARCHAR(200),
+    actor_rol VARCHAR(30),
+    detalle VARCHAR(500)
 );
 
 -- 6. Tabla de Detalles de Venta (Relacionada con Venta y Producto)
@@ -217,14 +232,16 @@ ON DUPLICATE KEY UPDATE stock = VALUES(stock);
 -- ============================================================
 
 INSERT INTO cliente (nombres, apellidos, rut, dvrut, email, contrasena, rol) VALUES
-('Maria', 'Gonzalez Lopez', 12345678, '9', 'maria@ecomarket.cl', '123456', 'CLIENTE'),
-('Juan', 'Perez Rodriguez', 23456789, '5', 'juan@ecomarket.cl', '123456', 'CLIENTE'),
-('Ana', 'Martinez Garcia', 34567890, 'K', 'ana@ecomarket.cl', '123456', 'CLIENTE'),
-('Carlos', 'Sanchez Hernandez', 45678901, '4', 'carlos@ecomarket.cl', '123456', 'CLIENTE'),
-('Sofia', 'Ruiz Fernandez', 56789012, '8', 'sofia@ecomarket.cl', '123456', 'CLIENTE'),
-('Pedro', 'Lopez Ramirez', 67890123, '1', 'pedro@ecomarket.cl', '123456', 'CLIENTE'),
-('Isabel', 'Garcia Torres', 78901234, '6', 'isabel@ecomarket.cl', '123456', 'CLIENTE'),
-('Diego', 'Rodriguez Silva', 89012345, '3', 'diego@ecomarket.cl', '123456', 'CLIENTE')
+('Maria', 'Gonzalez Lopez', 12345678, '9', 'maria@pedidos360.cl', '123456', 'CLIENTE'),
+('Juan', 'Perez Rodriguez', 23456789, '5', 'juan@pedidos360.cl', '123456', 'CLIENTE'),
+('Ana', 'Martinez Garcia', 34567890, 'K', 'ana@pedidos360.cl', '123456', 'CLIENTE'),
+('Carlos', 'Sanchez Hernandez', 45678901, '4', 'carlos@pedidos360.cl', '123456', 'CLIENTE'),
+('Sofia', 'Ruiz Fernandez', 56789012, '8', 'sofia@pedidos360.cl', '123456', 'CLIENTE'),
+('Pedro', 'Lopez Ramirez', 67890123, '1', 'pedro@pedidos360.cl', '123456', 'CLIENTE'),
+('Isabel', 'Garcia Torres', 78901234, '6', 'isabel@pedidos360.cl', '123456', 'CLIENTE'),
+('Diego', 'Rodriguez Silva', 89012345, '3', 'diego@pedidos360.cl', '123456', 'CLIENTE'),
+('Admin', 'Pedidos360', 11111111, '1', 'admin@pedidos360.cl', 'admin360', 'ADMIN'),
+('Operador', 'Pedidos360', 22222222, '2', 'operador@pedidos360.cl', 'operador360', 'OPERADOR')
 ON DUPLICATE KEY UPDATE
     apellidos = VALUES(apellidos),
     email = VALUES(email),
@@ -259,15 +276,15 @@ ON DUPLICATE KEY UPDATE
 -- 6. CREAR VENTAS DE EJEMPLO
 -- ============================================================
 
-INSERT INTO venta (tipo_envio, monto, cliente_id, direccion_id) VALUES
-('Retiro en tienda', 23000, 1, 1),
-('Envio a domicilio', 14000, 2, 3),
-('Retiro en tienda', 31700, 3, 4),
-('Envio a domicilio', 45600, 4, 5),
-('Retiro en tienda', 28300, 5, 6),
-('Envio a domicilio', 19500, 6, 7),
-('Retiro en tienda', 62400, 7, 8),
-('Retiro en tienda', 51800, 8, 9);
+INSERT INTO venta (tipo_envio, monto, fecha, estado, cliente_id, direccion_id) VALUES
+('Retiro en tienda', 23000, '2026-01-14', 'ENTREGADO', 1, 1),
+('Envio a domicilio', 14000, '2026-02-03', 'ENTREGADO', 2, 3),
+('Retiro en tienda', 31700, '2026-02-27', 'DESPACHADO', 3, 4),
+('Envio a domicilio', 45600, '2026-03-18', 'EN_PREPARACION', 4, 5),
+('Retiro en tienda', 28300, '2026-04-09', 'ACEPTADO', 5, 6),
+('Envio a domicilio', 19500, '2026-04-25', 'CREADO', 6, 7),
+('Retiro en tienda', 62400, '2026-05-06', 'CANCELADO', 7, 8),
+('Retiro en tienda', 51800, '2026-05-29', 'CREADO', 8, 9);
 
 -- ============================================================
 -- 7. CREAR DETALLES DE VENTAS

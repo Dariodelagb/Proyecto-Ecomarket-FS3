@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Operacion de pedidos | Pedidos360</title>
+  </head>
+  <body class="home-page role-orders-page" data-required-role="OPERADOR,ADMIN">
+    <header class="home-nav">
+      <a href="index.html" class="home-brand">
+        <img src="./images/logo/pedidos360_icon.png" alt="Pedidos360" class="home-brand__logo" />
+        <span>Pedidos360</span>
+      </a>
+      <nav class="home-menu" aria-label="Navegacion principal">
+        <a href="index.html">Inicio</a>
+        <a href="operador.html" aria-current="page">Pedidos</a>
+      </nav>
+      <div class="home-auth-actions">
+        <span class="home-auth-link auth-session-only" data-auth-user-name hidden>Operador</span>
+        <button class="home-auth-link auth-session-only" type="button" data-logout hidden>Cerrar sesion</button>
+      </div>
+    </header>
+
+    <main class="role-orders-main">
+      <section class="role-orders-heading">
+        <p class="role-orders-eyebrow">Centro de operacion</p>
+        <h1>Pedidos en curso</h1>
+        <p>Actualiza cada pedido respetando el flujo de preparacion y despacho.</p>
+      </section>
+
+      <section class="orders-panel" data-orders-mode="operator">
+        <div class="w-full overflow-x-auto">
+          <table class="min-w-[820px] w-full">
+            <thead>
+              <tr class="orders-table-heading">
+                <th>Pedido</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Estado</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table-body"></tbody>
+          </table>
+        </div>
+        <div id="orders-scroll-sentinel" class="h-2" aria-hidden="true"></div>
+        <p id="orders-load-status" class="orders-load-status" role="status"></p>
+      </section>
+    </main>
+  </body>
+</html>

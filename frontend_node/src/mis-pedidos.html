@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Mis pedidos | Pedidos360</title>
+  </head>
+  <body class="home-page role-orders-page" data-required-role="CLIENTE">
+    <header class="home-nav">
+      <a href="index.html" class="home-brand">
+        <img src="./images/logo/pedidos360_icon.png" alt="Pedidos360" class="home-brand__logo" />
+        <span>Pedidos360</span>
+      </a>
+      <nav class="home-menu" aria-label="Navegacion principal">
+        <a href="index.html">Inicio</a>
+        <a href="productos.html">Catalogo</a>
+        <a href="mis-pedidos.html" aria-current="page">Mis pedidos</a>
+      </nav>
+      <div class="home-auth-actions">
+        <a class="home-cart-link" href="carrito.html" aria-label="Abrir carrito">
+          <span aria-hidden="true">Carrito</span>
+          <span class="home-cart-count" data-cart-count>0</span>
+        </a>
+        <button class="home-auth-link auth-session-only" type="button" data-logout hidden>Cerrar sesion</button>
+      </div>
+    </header>
+
+    <main class="role-orders-main">
+      <section class="role-orders-heading">
+        <p class="role-orders-eyebrow">Seguimiento personal</p>
+        <h1>Mis ultimos pedidos</h1>
+        <p>Aqui puedes consultar exclusivamente tus compras recientes y su estado actual.</p>
+      </section>
+
+      <section class="orders-panel" data-orders-mode="client">
+        <div class="w-full overflow-x-auto">
+          <table class="min-w-[760px] w-full">
+            <thead>
+              <tr class="orders-table-heading">
+                <th>Pedido</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Estado</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table-body"></tbody>
+          </table>
+        </div>
+        <p id="orders-load-status" class="orders-load-status" role="status"></p>
+      </section>
+    </main>
+  </body>
+</html>

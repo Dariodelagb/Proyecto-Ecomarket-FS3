@@ -1,7 +1,7 @@
 services:
   mysql:
     image: mysql:8.0
-    container_name: ecomarket_mysql
+    container_name: pedidos360_mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: sistema_ventas
@@ -13,7 +13,7 @@ services:
       - mysql_data:/var/lib/mysql
       - ./db/db/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     networks:
-      - ecomarket_network
+      - pedidos360_network
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
       interval: 5s
@@ -23,7 +23,7 @@ services:
 
   db:
     build: ./db/db
-    container_name: ecomarket_db
+    container_name: pedidos360_db
     restart: on-failure
     ports:
       - "8080:8080"
@@ -34,6 +34,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/sistema_ventas?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
+      - PEDIDOS360_REPORTES_INTERNAL_KEY=pedidos360-internal
     healthcheck:
       test: ["CMD-SHELL", "bash -ec ': > /dev/tcp/127.0.0.1/8080'"]
       interval: 5s
@@ -41,40 +42,41 @@ services:
       retries: 30
       start_period: 60s
     networks:
-      - ecomarket_network
+      - pedidos360_network
 
   frontend:
     profiles:
       - old-frontend
     build: ./frontend/frontend
-    container_name: ecomarket_frontend
+    container_name: pedidos360_frontend_legacy
     ports:
       - "8081:8081"
     depends_on:
       db:
         condition: service_healthy
     networks:
-      - ecomarket_network
+      - pedidos360_network
 
   sistemareportes:
     build: ./sistemareportes
-    container_name: ecomarket_sistemareportes
+    container_name: pedidos360_reportes
     restart: on-failure
     ports:
       - "8082:8082"
     environment:
-      - ECOMARKET_PRUEBAS_MYSQL_HOST=mysql
-      - ECOMARKET_PRUEBAS_MYSQL_PORT=3306
-      - ECOMARKET_PRUEBAS_API_URL=http://db:8080/api
+      - PEDIDOS360_PRUEBAS_MYSQL_HOST=mysql
+      - PEDIDOS360_PRUEBAS_MYSQL_PORT=3306
+      - PEDIDOS360_PRUEBAS_API_URL=http://db:8080/api
+      - PEDIDOS360_REPORTES_INTERNAL_KEY=pedidos360-internal
     depends_on:
       db:
         condition: service_healthy
     networks:
-      - ecomarket_network
+      - pedidos360_network
 
   frontend_node:
     build: ./frontend_node
-    container_name: ecomarket_frontend_node
+    container_name: pedidos360_frontend
     restart: on-failure
     ports:
       - "8083:80"
@@ -88,11 +90,11 @@ services:
       retries: 30
       start_period: 20s
     networks:
-      - ecomarket_network
+      - pedidos360_network
 
 volumes:
   mysql_data:
 
 networks:
-  ecomarket_network:
+  pedidos360_network:
     driver: bridge

@@ -32,7 +32,7 @@ const generateHTMLPlugins = () =>
     return new HtmlWebpackPlugin({
       filename,
       template: `./src/${filename}`,
-      favicon: `./src/images/logo/ecomarket_logo.png`,
+      favicon: `./src/images/logo/pedidos360_icon.png`,
       inject: "body",
     });
   });

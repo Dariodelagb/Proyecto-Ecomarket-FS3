@@ -1,6 +1,27 @@
-# Ecomarket - Sistema de Gestión de Ventas
+# Pedidos360 - Gestion integral de pedidos
 
-Proyecto desarrollado para la gestión de productos, inventarios y ventas, containerizado con **Docker** para garantizar consistencia entre entornos.
+Proyecto para gestionar catalogo, inventario, pedidos, usuarios, auditoria y reportes, containerizado con **Docker** para garantizar consistencia entre entornos.
+
+## Roles y flujo de pedidos
+
+- **Cliente:** consulta solamente sus ultimos pedidos y el estado actual.
+- **Operador:** consulta pedidos pendientes o en curso y actualiza sus estados.
+- **Admin:** accede al dashboard, ventas, usuarios activos, pedidos y reporte Excel con auditoria.
+
+Flujo permitido: `CREADO -> ACEPTADO -> EN_PREPARACION -> DESPACHADO -> ENTREGADO`. Un pedido puede cancelarse antes del despacho. El stock se descuenta una sola vez al aceptar el pedido.
+
+Usuarios iniciales:
+
+- Admin: `admin@pedidos360.cl`, RUT `11111111-1`, clave `admin360`.
+- Operador: `operador@pedidos360.cl`, RUT `22222222-2`, clave `operador360`.
+
+Vistas principales:
+
+- `http://localhost:8083/dashboard.html`: panel exclusivo de Admin.
+- `http://localhost:8083/operador.html`: pedidos pendientes y en curso.
+- `http://localhost:8083/mis-pedidos.html`: ultimos pedidos del Cliente autenticado.
+
+Los endpoints protegidos usan el header `X-Session-Token`. La descarga del Excel se solicita desde el boton del dashboard y llega desde `http://localhost:8082/get-reporte`; el archivo incluye ventas, estados y registros de auditoria.
 
 ## Requisitos
 Instalar:
@@ -100,7 +121,7 @@ Flujo principal:
 
 El repositorio incluye una coleccion Postman lista para importar:
 
-Ecomarket_FS3.postman_collection.json
+Pedidos360.postman_collection.json
 
 Variables principales de la coleccion:
 

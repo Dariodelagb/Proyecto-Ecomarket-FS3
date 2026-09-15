@@ -1,0 +1,30 @@
+<section
+  id="tabla-pedidos"
+  data-orders-mode="admin"
+  class="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6"
+>
+  <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Pedidos y ventas</h3>
+      <p class="mt-1 text-theme-sm text-gray-500 dark:text-gray-400">Se cargan nuevos registros a medida que avanzas.</p>
+    </div>
+    <button class="orders-report-button" type="button" data-report-download>Descargar reporte Excel</button>
+  </div>
+
+  <div class="w-full overflow-x-auto">
+    <table class="min-w-[820px] w-full">
+      <thead>
+        <tr class="border-y border-gray-100 text-left dark:border-gray-800">
+          <th class="py-3 pr-4 text-theme-xs font-medium text-gray-500 dark:text-gray-400">Pedido</th>
+          <th class="py-3 pr-4 text-theme-xs font-medium text-gray-500 dark:text-gray-400">Fecha</th>
+          <th class="py-3 pr-4 text-theme-xs font-medium text-gray-500 dark:text-gray-400">Cliente</th>
+          <th class="py-3 pr-4 text-theme-xs font-medium text-gray-500 dark:text-gray-400">Estado</th>
+          <th class="py-3 text-theme-xs font-medium text-gray-500 dark:text-gray-400">Total</th>
+        </tr>
+      </thead>
+      <tbody id="orders-table-body"></tbody>
+    </table>
+  </div>
+  <div id="orders-scroll-sentinel" class="h-2" aria-hidden="true"></div>
+  <p id="orders-load-status" class="py-3 text-center text-theme-sm text-gray-500 dark:text-gray-400" role="status"></p>
+</section>

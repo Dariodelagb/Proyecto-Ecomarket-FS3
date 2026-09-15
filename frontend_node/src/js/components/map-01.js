@@ -17,7 +17,7 @@ const map01 = () => {
         },
         hover: {
           fillOpacity: 1,
-          fill: "#7fbd19",
+          fill: "#2e90fa",
         },
       },
       markers: [
@@ -38,12 +38,12 @@ const map01 = () => {
       markerStyle: {
         initial: {
           strokeWidth: 1,
-          fill: "#7fbd19",
+          fill: "#2e90fa",
           fillOpacity: 1,
           r: 4,
         },
         hover: {
-          fill: "#7fbd19",
+          fill: "#2e90fa",
           fillOpacity: 1,
         },
         selected: {},

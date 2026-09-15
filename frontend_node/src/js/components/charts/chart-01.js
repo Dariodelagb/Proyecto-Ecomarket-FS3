@@ -1,4 +1,5 @@
 import ApexCharts from "apexcharts";
+import { getSession } from "../auth-loader";
 
 const monthLabels = [
   "Ene",
@@ -25,7 +26,9 @@ const getVentaDate = (venta) => {
 };
 
 const loadMonthlySales = async () => {
-  const response = await fetch("/api/ventas-completas");
+  const response = await fetch("/api/ventas-completas", {
+    headers: { "X-Session-Token": getSession()?.token || "" },
+  });
   if (!response.ok) throw new Error("No se pudieron cargar las ventas");
 
   const ventas = await response.json();
@@ -55,7 +58,7 @@ const chart01 = () => {
         data: emptyMonthlySales(),
       },
     ],
-    colors: ["#7fbd19"],
+    colors: ["#2e90fa"],
     chart: {
       fontFamily: "Outfit, sans-serif",
       type: "bar",

@@ -1,3 +1,5 @@
+import { getSession } from "./auth-loader";
+
 const PRODUCT_FORM_ID = "admin-product-form";
 const CATEGORY_SELECT_ID = "admin-product-category";
 const MESSAGE_ID = "admin-product-message";
@@ -76,6 +78,7 @@ const createProduct = async ({ nombre, precio, categoriaId }) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-Session-Token": getSession()?.token || "",
     },
     body: JSON.stringify({
       nombre,
@@ -98,6 +101,7 @@ const createStock = async ({ productoId, stock }) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-Session-Token": getSession()?.token || "",
     },
     body: JSON.stringify({
       stock,
@@ -139,7 +143,7 @@ const handleSubmit = async (event) => {
     form.reset();
     await loadCategories();
     setMessage(`Producto "${product.nombre}" agregado correctamente.`, "success");
-    window.dispatchEvent(new CustomEvent("ecomarket:products-updated"));
+    window.dispatchEvent(new CustomEvent("pedidos360:products-updated"));
   } catch (error) {
     console.error("Error creando producto:", error);
     setMessage(error.message || "No se pudo crear el producto.", "error");

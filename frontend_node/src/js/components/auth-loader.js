@@ -5,7 +5,7 @@ import {
   signOutFromMicrosoft,
 } from "../msal-config";
 
-const SESSION_KEY = "ecomarketSession";
+const SESSION_KEY = "pedidos360Session";
 const MSAL_SESSION_KEY = "msalSession";
 
 const readJson = (storage, key) => {
@@ -67,6 +67,27 @@ const getActiveProfile = () => {
 const getActiveClientId = () => getSession()?.cliente?.id || null;
 
 const isAdminSession = () => getSession()?.cliente?.rol === "ADMIN";
+const isOperatorSession = () => getSession()?.cliente?.rol === "OPERADOR";
+const isClientSession = () => getSession()?.cliente?.rol === "CLIENTE";
+
+const getRoleRedirect = (role) => {
+  if (role === "ADMIN") return "dashboard.html";
+  if (role === "OPERADOR") return "operador.html";
+  return "mis-pedidos.html";
+};
+
+const enforceRequiredRole = () => {
+  const requiredRole = document.body?.dataset.requiredRole;
+  if (!requiredRole) return true;
+
+  const role = getSession()?.cliente?.rol;
+  const allowedRoles = requiredRole.split(",").map((item) => item.trim());
+  if (!role || !allowedRoles.includes(role)) {
+    window.location.replace(role ? getRoleRedirect(role) : "login.html");
+    return false;
+  }
+  return true;
+};
 
 const enforceDigits = (input, maxLength) => {
   if (!input) return;
@@ -91,6 +112,8 @@ const setText = (selector, value, fallback = "") => {
 const updateAuthControls = () => {
   const hasSession = Boolean(getSession()?.token || getMsalSession()?.authenticated);
   const hasAdminSession = hasSession && isAdminSession();
+  const hasOperatorSession = hasSession && isOperatorSession();
+  const hasClientSession = hasSession && isClientSession();
   const profile = getActiveProfile();
 
   setText("[data-auth-user-name], #user-name", profile.displayName, "Usuario");
@@ -108,6 +131,14 @@ const updateAuthControls = () => {
 
   document.querySelectorAll(".auth-admin-only").forEach((element) => {
     element.hidden = !hasAdminSession;
+  });
+
+  document.querySelectorAll(".auth-operator-only").forEach((element) => {
+    element.hidden = !hasOperatorSession;
+  });
+
+  document.querySelectorAll(".auth-client-only").forEach((element) => {
+    element.hidden = !hasClientSession;
   });
 };
 
@@ -275,7 +306,7 @@ const setupRegisterForm = () => {
 
       const session = await response.json();
       setSession(session);
-      const redirectUrl = session?.cliente?.rol === "ADMIN" ? "dashboard.html" : "index.html";
+      const redirectUrl = getRoleRedirect(session?.cliente?.rol);
       window.location.href = redirectUrl;
     } catch (error) {
       console.error("Error registrando usuario:", error);
@@ -319,7 +350,7 @@ const setupLoginForm = () => {
 
       const session = await response.json();
       setSession(session);
-      const redirectUrl = session?.cliente?.rol === "ADMIN" ? "dashboard.html" : "index.html";
+      const redirectUrl = getRoleRedirect(session?.cliente?.rol);
       window.location.href = redirectUrl;
     } catch (error) {
       console.error("Error iniciando sesion:", error);
@@ -387,12 +418,15 @@ const initializeAuth = async () => {
 
   updateAuthControls();
   autofillUserFields();
+
+  enforceRequiredRole();
 };
 
 // La pagina configurada como redirectUri tambien se carga dentro del popup.
 // No debe procesar la respuesta: la instancia MSAL de la ventana principal
 // observa esa URL, obtiene el resultado y cierra el popup automaticamente.
 if (!isMicrosoftAuthenticationPopup()) {
+  enforceRequiredRole();
   document.addEventListener("DOMContentLoaded", initializeAuth);
 }
 
@@ -404,6 +438,8 @@ export {
   getMsalSession,
   getSession,
   isAdminSession,
+  isOperatorSession,
+  isClientSession,
   setMsalSession,
   updateAuthControls,
   validateSession,

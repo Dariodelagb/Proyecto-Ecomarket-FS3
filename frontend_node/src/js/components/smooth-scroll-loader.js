@@ -1,6 +1,6 @@
 import Lenis from "lenis";
 
-const STORAGE_KEY = "ecomarketSmoothScroll";
+const STORAGE_KEY = "pedidos360SmoothScroll";
 let lenisInstance = null;
 let rafId = null;
 

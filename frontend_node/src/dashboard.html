@@ -7,9 +7,9 @@
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Dashboard | EcoMarket</title>
+    <title>Dashboard | Pedidos360</title>
   </head>
-  <body
+  <body data-required-role="ADMIN"
     x-data="{ page: 'ecommerce', 'loaded': true, 'darkMode': true, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
     x-init="
          darkMode = localStorage.getItem('darkMode') === null ? true : JSON.parse(localStorage.getItem('darkMode'));
@@ -37,6 +37,10 @@
               <div class="col-span-12 space-y-6">
                 <include src="./partials/metric-group/metric-group-01.html" />
                 <include src="./partials/chart/chart-01.html" />
+              </div>
+
+              <div class="col-span-12">
+                <include src="./partials/table/table-orders.html" />
               </div>
 
               <div class="col-span-12">

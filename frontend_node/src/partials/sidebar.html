@@ -9,19 +9,19 @@
   >
     <a href="index.html">
       <span class="logo" :class="sidebarToggle ? 'hidden' : ''">
-        <img class="h-16 w-auto dark:hidden" src="./images/logo/ecomarket_logo.png" alt="EcoMarket" />
+        <img class="h-16 w-auto dark:hidden" src="./images/logo/pedidos360_logo.png" alt="Pedidos360" />
         <img
           class="hidden h-16 w-auto dark:block"
-          src="./images/logo/ecomarket_logo.png"
-          alt="EcoMarket"
+          src="./images/logo/pedidos360_logo.png"
+          alt="Pedidos360"
         />
       </span>
 
       <img
         class="logo-icon h-12 w-12 object-contain"
         :class="sidebarToggle ? 'lg:block' : 'hidden'"
-        src="./images/logo/ecomarket_logo.png"
-        alt="EcoMarket"
+        src="./images/logo/pedidos360_logo.png"
+        alt="Pedidos360"
       />
     </a>
   </div>
@@ -120,6 +120,15 @@
                 :class="sidebarToggle ? 'lg:hidden' : 'flex'"
                 class="flex flex-col gap-1 mt-2 menu-dropdown pl-9"
               >
+                <li>
+                  <a
+                    href="dashboard.html#tabla-pedidos"
+                    class="menu-dropdown-item group"
+                    :class="page === 'ecommerce' ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'"
+                  >
+                    Pedidos y ventas
+                  </a>
+                </li>
                 <li>
                   <a
                     href="dashboard.html"

@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadProductsTable();
 });
 
-window.addEventListener("ecomarket:products-updated", () => {
+window.addEventListener("pedidos360:products-updated", () => {
   loadProductsTable();
 });
 

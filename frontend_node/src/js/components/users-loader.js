@@ -1,3 +1,5 @@
+import { getSession } from "./auth-loader";
+
 const escapeHtml = (value) =>
   String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -22,7 +24,9 @@ async function loadUsersTable() {
   if (!tableBody) return;
 
   try {
-    const response = await fetch("/api/clientes");
+    const response = await fetch("/api/clientes/activos", {
+      headers: { "X-Session-Token": getSession()?.token || "" },
+    });
     if (!response.ok) throw new Error("Error al obtener usuarios");
 
     const clientes = await response.json();

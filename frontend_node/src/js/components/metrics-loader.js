@@ -1,3 +1,7 @@
+import { getSession } from "./auth-loader";
+
+const adminHeaders = () => ({ "X-Session-Token": getSession()?.token || "" });
+
 function formatNumber(num) {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
@@ -15,7 +19,7 @@ async function loadClientCount() {
   if (!countElement) return;
 
   try {
-    const response = await fetch("/api/clientes/count");
+    const response = await fetch("/api/clientes/activos/count", { headers: adminHeaders() });
     if (!response.ok) throw new Error("Error al obtener clientes");
 
     const data = await response.json();
@@ -31,7 +35,7 @@ async function loadSalesCount() {
   if (!countElement) return;
 
   try {
-    const response = await fetch("/api/ventas/count");
+    const response = await fetch("/api/ventas/count", { headers: adminHeaders() });
     if (!response.ok) throw new Error("Error al obtener ventas");
 
     const data = await response.json();
@@ -47,7 +51,7 @@ async function loadSalesTotalMoney() {
   if (!totalElement) return;
 
   try {
-    const response = await fetch("/api/ventas-completas");
+    const response = await fetch("/api/ventas-completas", { headers: adminHeaders() });
     if (!response.ok) throw new Error("Error al obtener ventas completas");
 
     const ventas = await response.json();
