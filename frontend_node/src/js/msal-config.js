@@ -5,7 +5,7 @@ const CLIENT_ID = "64533da2-6952-4e6c-8afa-c4eafddd0060";
 const msalConfig = {
   auth: {
     clientId: CLIENT_ID,
-    authority: "https://login.microsoftonline.com/d00e23b8-6f53-4f67-8a7b-b1f47ab3a272",
+    authority: "https://login.microsoftonline.com/organizations",
     redirectUri: window.location.origin,
     postLogoutRedirectUri: window.location.origin,
     navigateToLoginRequestUrl: false,

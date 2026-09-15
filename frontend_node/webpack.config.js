@@ -3,7 +3,7 @@ const glob = require("glob");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-const apiTarget = process.env.PEDIDOS360_API_TARGET || "http://34.231.143.20:8080";
+const apiTarget = process.env.PEDIDOS360_API_TARGET || "https://6wrmca2xfl.execute-api.us-east-1.amazonaws.com";
 const reportsTarget = process.env.PEDIDOS360_REPORTS_TARGET || "http://34.231.143.20:8082";
 
 const INCLUDE_PATTERN =

@@ -288,7 +288,14 @@ public class SistemaVentasController {
 
     // --- PRODUCTOS ---
     @GetMapping("/productos")
-    public List<Producto> listarProductos() { return productoRepo.findAll(); }
+    public List<Producto> listarProductos() {
+        List<Producto> productos = productoRepo.findAll();
+        productos.forEach(producto -> stockProductoRepo.findByProductoId(producto.getId())
+                .ifPresentOrElse(
+                        stockProducto -> producto.setStock(stockProducto.getStock()),
+                        () -> producto.setStock(0)));
+        return productos;
+    }
 
     @PostMapping("/productos")
     public Producto crearProducto(

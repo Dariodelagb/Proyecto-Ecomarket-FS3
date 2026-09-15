@@ -43,10 +43,18 @@ const loadCategories = async () => {
   if (!select) return;
 
   try {
-    const response = await fetch("/api/categorias");
+    // El API Gateway actual no publica /api/categorias; las categorías ya
+    // vienen anidadas en la respuesta de productos.
+    const response = await fetch("/api/productos");
     if (!response.ok) throw new Error("No se pudieron cargar las categorias");
 
-    const categories = await response.json();
+    const products = await response.json();
+    const categories = [...new Map(
+      products
+        .filter((product) => product.categoria?.id)
+        .map((product) => [product.categoria.id, product.categoria]),
+    ).values()];
+
     select.innerHTML = '<option value="">Selecciona una categoria</option>';
 
     categories.forEach((category) => {
@@ -97,7 +105,7 @@ const createProduct = async ({ nombre, precio, categoriaId }) => {
 };
 
 const createStock = async ({ productoId, stock }) => {
-  const response = await fetch("/api/stock-producto", {
+  const response = await fetch("/api/bodega", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

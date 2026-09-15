@@ -15,4 +15,7 @@ public class Producto {
     @ManyToOne
     @JoinColumn(name = "categoria_producto_id")
     private CategoriaProducto categoria;
+
+    @Transient
+    private Integer stock;
 }

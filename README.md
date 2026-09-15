@@ -299,7 +299,7 @@ En el Security Group de EC2 se debe permitir TCP `8080` solamente desde la IP pu
 El frontend local esta configurado para redirigir por defecto:
 
 ```text
-/api       -> http://34.231.143.20:8080/api
+/api       -> https://6wrmca2xfl.execute-api.us-east-1.amazonaws.com/api/
 /reportes  -> http://34.231.143.20:8082
 ```
 

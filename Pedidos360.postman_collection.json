@@ -8,7 +8,7 @@
   "variable": [
     {
       "key": "db_base_url",
-      "value": "http://localhost:8080/api"
+      "value": "https://6wrmca2xfl.execute-api.us-east-1.amazonaws.com/api/"
     },
     {
       "key": "reportes_base_url",
